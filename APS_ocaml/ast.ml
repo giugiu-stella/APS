@@ -18,7 +18,6 @@ type expr =
   | ASTFun of arg list * expr
   | ASTOr of expr * expr
 
-
 and stat = 
     ASTEcho of expr
       
