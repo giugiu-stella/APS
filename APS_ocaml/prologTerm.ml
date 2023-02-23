@@ -11,13 +11,13 @@ open Ast
   
 let rec print_expr e =
   match e with
-      ASTNum n -> Printf.printf"num(%d)" n
+      ASTNum n -> Printf.printf "%d" n
     | ASTId x -> Printf.printf"id(%s)" x
     | ASTApp(e, es) -> (
       Printf.printf"app(";
       print_expr e;
       Printf.printf",[";
-      print_exprs es;
+      print_list print_args args ",";
       Printf.printf"])"
     )
     | ASTIf(cond,vrai,faux) -> (
@@ -42,7 +42,7 @@ let rec print_expr e =
       Printf.printf "abs";
       Printf.printf "(";
       Printf.printf "[";
-      print_args args;
+      print_list print_args args ",";
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
@@ -84,14 +84,24 @@ let rec print_cmds cs =
       c::[] -> print_cmd c
     | _ -> failwith "not yet implemented"
 
+let rec print_list print l sep =
+  match l with
+  [] -> ()
+  | [x] -> print x;
+  | x::reste -> print x; Printf.printf "%s" sep; print_list print reste sep
+
+let print_args (x,t) = Printf.printf "(%s," x; print_type t;Printf.printf ")";
+
 let rec print_type t=
   match t with 
-  ASTTypBool -> ????
-  | ASTTypInt -> ????
+  ASTTypBool -> Printf.printf "bool";
+  | ASTTypInt -> Printf.printf "int";
   | ASTTypFleche(typ,typs) -> (
       print_type typ;
       Printf.printf ",";
-      ????? typs;
+      Printf.printf "[";
+      print_list print_type typs ","; 
+      Printf.printf "]";
     )
 
 let print_arg arg = 
@@ -124,7 +134,7 @@ let print_def d =
       print_type type;
       Printf.printf ",";
       Printf.printf "[";
-      ?????? args;
+      print_list print_args args ",";
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
@@ -138,7 +148,7 @@ let print_def d =
       print_type type;
       Printf.printf ",";
       Printf.printf "[";
-      ???? args;
+      print_list print_args args ",";
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
