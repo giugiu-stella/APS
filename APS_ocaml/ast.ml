@@ -20,9 +20,13 @@ type expr =
 
 and stat = 
     ASTEcho of expr
-      
+
 and cmd =
     ASTStat of stat
+    | ASTDef of def 
+
+and prog= 
+    cmd list
 
 and typ=
     ASTTypBool
