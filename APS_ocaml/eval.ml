@@ -48,6 +48,7 @@ let eval_expr env e = match e with
                                         INZ(1)-> eval_expr env e2
                                         | INZ(0) -> eval_expr env e3
                                         | _-> assert false )
+                    | ASTFun(args, e) -> let f = INF(e,args,env) in Env.add e args env
                     | ASTApp(e,es) ->(match (operators e) with
                                     true -> app_op e es
                                     | false -> let INF(e1,xs,env1)= eval_expr env e in let env2= 
