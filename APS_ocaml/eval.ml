@@ -2,40 +2,30 @@ module Env = Map.Make(String)
 type value = INZ of int | INF of expr * string list * envi | INFR of value
 and envi = value Env.t
 
+let operators op = 
+  match op with
+    NOT -> true
+    | ADD -> true
+    | MUL -> true
+    | SUB -> true
+    | DIV -> true
+    | EQ -> true
+    | LT -> true
+    | _ -> false
+
 (* Env.add key val map  ; Env.find key map  ; Env.mem val *)
-
-let integer i = 
-    match i with
-    INZ(i) -> true
-    | _ -> false
-
-let eval_unary operator e1 = 
-    match operator with
-    Not -> if (integer(e1) && e1==0) then 1
-        else if (integer(e1) && e1==1) then 0
-            else "ERROR PAS LES BONS ARGUMEMENTS !"
-
-let eval_binary operator e1 e2 =
-    match operator with
-    EQ -> if (integer(e1) && integer(e2) && e1==e2) then 1 
-        else 0
-    | LT -> if (integer(e1) && integer(e2) && e1<e2) then 1
-            else 0
-    | ADD -> (integer(e1) && integer(e2)) then INZ(e1) + INZ(e2)
-    | SUB ->  (integer(e1) && integer(e2)) then INZ(e1) - INZ(e2)
-    | MUL ->  (integer(e1) && integer(e2)) then INZ(e1) * INZ(e2)
-    | DIV ->  (integer(e1) && integer(e2)) then INZ(e1) / INZ(e2)
-    | AND ->  (integer(e1) && integer(e2) && INZ(e1)==INZ(1)) then INZ(e2)
-
-let boolto i = 
-    match i with
-    INZ(i) -> true
-    | _ -> false
 
 let app_op operator vs =
     match operator,vs with
-    | EQ,INZ(n1),INZ(n2) -> INZ(if(n1==n2)then )
-
+    ASTId("NOT"),[INZ(n)] -> if(n==1) then 0 
+                            else if(n==0) then 1
+                                else assert false            
+    | ASTId("EQ"),[INZ(n1);INZ(n2)] -> INZ(if(n1==n2)then 1 else 0)
+    | ASTId("LT"),[INZ(n1);INZ(n2)] ->  INZ(if(n1<n2)then 1 else 0)
+    | ASTId("ADD"),[INZ(n1);INZ(n2)] ->  INZ(e1) + INZ(e2)
+    | ASTId("SUB"),[INZ(n1);INZ(n2)] ->  INZ(e1) - INZ(e2)
+    | ASTId("MUL"),[INZ(n1);INZ(n2)] ->  INZ(e1) * INZ(e2)
+    | ASTId("DIV"),[INZ(n1);INZ(n2)] ->  INZ(e1) / INZ(e2)
 
 let lookup x env = macth Env.find_opt x env with 
             | None -> assert false
@@ -46,7 +36,24 @@ let eval_expr env e = match e with
                     | ASTId("false") -> INZ(0)
                     | ASTNum(n) -> INZ(n)
                     | ASTId(x)-> lookup x env
-                    | 
+                    | ASTAnd(e1,e2) -> (match (eval_expr env e1) with 
+                                        INZ(1)-> eval_expr env e2
+                                        | INZ(0) as v -> v 
+                                        | _-> assert false) 
+                    | ASTOr(e1,e2) -> (match (eval_expr env e1) with 
+                                        INZ(0)-> eval_expr env e2
+                                        | INZ(1) as v -> v 
+                                        | _-> assert false)
+                    | ASTIf(e1,e2,e3)-> (match (eval_expr env e1) with 
+                                        INZ(1)-> eval_expr env e2
+                                        | INZ(0) -> eval_expr env e3
+                                        | _-> assert false )
+                    | ASTApp(e,es) ->(match (operators e) with
+                                    true -> app_op e es
+                                    | false -> let INF(e1,xs,env1)= eval_expr env e in let env2= 
+                                        (List.fold_right2 (fun (x,e) env -> Env.add x (eval_expr env e) env) env xs es) in eval_expr e1 env2
+                                    |_ -> assert false)
+                    
 
 
 
