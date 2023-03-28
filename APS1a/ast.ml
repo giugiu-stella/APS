@@ -18,12 +18,16 @@ type expr =
   | ASTFun of arg list * expr
   | ASTOr of expr * expr
 
+and exprp= 
+    ASTExprpExpr of expr
+    | ASTExprpAdr of string
+
 and stat = 
     ASTEcho of expr
-    | ASTSET of string * expr
-    | ASTIF of expr * block * block 
-    | ASTWHILE of expr * block 
-    | ASTCALL of string * expr list
+    | ASTSet of string * expr
+    | ASTIfStat of expr * block * block 
+    | ASTWhile of expr * block 
+    | ASTCall of string * exprp list
 
 and cmd =
     ASTStat of stat
@@ -40,6 +44,11 @@ and typ=
 	
 and arg=
     ASTArg of string * typ
+
+and argp= 
+    ASTArgp of string * typ
+    | ASTArgpVar of string *typ
+
 
 and def = 
     ASTDefConst of string * typ * expr

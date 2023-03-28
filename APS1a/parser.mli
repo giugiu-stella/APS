@@ -12,6 +12,8 @@ type token =
   | FALSE
   | AND
   | OR
+  | ADR
+  | VAR
   | IF
   | CONST
   | FUN
@@ -21,6 +23,10 @@ type token =
   | V
   | FLECHE
   | ETOILE
+  | PROC
+  | SET
+  | WHILE
+  | CALL
 
 val prog :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.cmd list

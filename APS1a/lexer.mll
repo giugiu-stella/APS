@@ -41,6 +41,8 @@ rule token = parse
   | "int"			 { INT }
   | "bool"			 { BOOL }
   | "if"			 { IF }
+  | "var" 			 {VAR}
+  | "adr"            {ADR}
   | ['0'-'9']+('.'['0'-'9'])? as lxm { NUM(int_of_string lxm) }
   | ['a'-'z']['a'-'z''A'-'Z''0'-'9']* as lxm { IDENT(lxm) }
   | eof              { raise Eof }

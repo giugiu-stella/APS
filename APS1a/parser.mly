@@ -20,7 +20,7 @@ open Ast
 %token ECHO
 %token INT BOOL 
 %token TRUE FALSE
-%token AND OR 
+%token AND OR ADR VAR
 %token IF ECHO CONST FUN REC
 %token DP PV V FLECHE ETOILE
 %token VAR PROC SET IF WHILE CALL
@@ -30,11 +30,10 @@ open Ast
 %type <Ast.cmd list> cmds
 %type <Ast.cmd list> prog
 
-
 %start prog
 
 %%
-prog: block    { $1}
+prog: block    {$1}
 ;
 
 block : LBRA cmds RBRA    { $2 }
@@ -42,10 +41,16 @@ block : LBRA cmds RBRA    { $2 }
 
 cmds:
   stat                  { [ASTStat $1] }
+  | def PV cmds			{ ASTDef($1)::$3}
+  | stat PV cmds 			{ ASTStat($1)::$3}
 ;
 
 stat:
   ECHO expr             { ASTEcho($2) }
+  | SET IDENT expr      { ASTSet($2,$3)}
+  | IF expr block block {ASTIfStat($2,$3,$4)}
+  | WHILE expr block    { ASTWhile($2,$3)}
+  | CALL IDENT exprsp {ASTCall($2,$3)}
 ;
 
 expr:
@@ -61,6 +66,16 @@ expr:
 exprs :
   expr       { [$1] }
 | expr exprs { $1::$2 }
+;
+
+exprp:
+	expr 	{ ASTExprpExpr($1)}
+	| LPAR ADR IDENT RPAR {ASTExprpAdr($3)}
+;
+	
+exprsp:
+ 	exprp      { [$1] }
+	| exprp exprsp { $1::$2 }
 ;
 
  typ:
@@ -79,10 +94,21 @@ exprs :
  	arg {[$1]}
  	| arg V args {$1::$3};
  	
+argp: 
+	IDENT DP typ {ASTArgp($1,$3)}
+	| VAR IDENT DP typ {ASTArgpVar($2,$4)};
+
+argps:
+	argp {[$1]}
+ 	| argp V argps {$1::$3};
+ 	
  def:
 	CONST IDENT typ expr                  { ASTDefConst($2, $3, $4) }
   | FUN IDENT typ LBRA args RBRA expr     { ASTDefFun($2, $3, $5, $7) }
   | FUN REC IDENT typ LBRA args RBRA expr { ASTDefFunRec($3,$4,$6,$8) }
+  | VAR IDENT typ 						  { ASTDefVar($2,$3)}
+  | PROC IDENT LBRA args RBRA block       { ASTDefProc($2,$4,$6)}
+  | PROC REC IDENT LBRA args RBRA block       { ASTDefProcRec($3,$5,$7)}
   ;
  
 
