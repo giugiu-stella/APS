@@ -49,11 +49,10 @@ and argp=
     ASTArgp of string * typ
     | ASTArgpVar of string *typ
 
-
 and def = 
     ASTDefConst of string * typ * expr
   | ASTDefFun of string * typ * arg list * expr
   | ASTDefFunRec of string * typ * arg list * expr
   | ASTDefVar of string * typ
-  | ASTDefProc of string * arg list * block
-  | ASTDefProcRec of string * arg list * block
+  | ASTDefProc of string * argp list * block
+  | ASTDefProcRec of string * argp list * block

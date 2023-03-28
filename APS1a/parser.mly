@@ -107,8 +107,8 @@ argps:
   | FUN IDENT typ LBRA args RBRA expr     { ASTDefFun($2, $3, $5, $7) }
   | FUN REC IDENT typ LBRA args RBRA expr { ASTDefFunRec($3,$4,$6,$8) }
   | VAR IDENT typ 						  { ASTDefVar($2,$3)}
-  | PROC IDENT LBRA args RBRA block       { ASTDefProc($2,$4,$6)}
-  | PROC REC IDENT LBRA args RBRA block       { ASTDefProcRec($3,$5,$7)}
+  | PROC IDENT LBRA argps RBRA block       { ASTDefProc($2,$4,$6)}
+  | PROC REC IDENT LBRA argps RBRA block   { ASTDefProcRec($3,$5,$7)}
   ;
  
 

@@ -57,7 +57,7 @@ let rec print_expr e =
       Printf.printf ")";
     )
       
-and print_exprs es =
+let print_exprs es =
   match es with
       [] -> ()
     | [e] -> print_expr e
@@ -67,13 +67,66 @@ and print_exprs es =
 	print_exprs es
       )
 
+let rec print_exprp ep = 
+  match ep with
+    ASTExprpExpr(e) -> print_expr e;
+    | ASTExprpAdr(e)->(
+      Printf.printf "adr";
+      Printf.printf "(";
+      print_expr e;
+      Printf.printf ")";
+    )
+
+let rec print_exprsp esp =
+  match esp with
+      [] -> ()
+    | [e] -> print_exprp e
+    | e::es -> (
+	print_exprp e;
+	print_char ',';
+	print_exprsp es)
+
+
 let print_stat s =
   match s with
       ASTEcho e -> (
-	Printf.printf("echo(");
-	print_expr(e);
-	Printf.printf(")")
-      )
+        Printf.printf("echo(");
+        print_expr(e);
+        Printf.printf(")")
+        )
+      | ASTSet(x,e)-> 
+        Printf.printf("set");
+        Printf.printf "(";
+        Printf.printf "%s" x;
+        print_char ',';
+        print_expr e;
+        Printf.printf ")";
+      | ASTIfStat(e,bk1,bk2)-> (
+        Printf.printf "if";
+        Printf.printf "(";
+        print_expr e;
+        Printf.printf ",";
+        print_block bk1;
+        Printf.printf ",";
+        print_block bk2;
+        Printf.printf ")";
+        )
+      | ASTWhile(e,bk)->(
+        Printf.printf "while";
+        Printf.printf "(";
+        print_expr e;
+        Printf.printf ",";
+        print_block bk;
+        Printf.printf ")";
+        )
+      | ASTCall(x,eps)->(
+        Printf.printf "call";
+        Printf.printf "(";
+        Printf.printf "%s" x;
+        Printf.printf ",";
+        print_exprsp eps;
+        Printf.printf ")";
+        )
 
 let print_cmd c =
   match c with
@@ -89,8 +142,6 @@ let rec print_list print l sep =
   [] -> ()
   | [x] -> print x;
   | x::reste -> print x; Printf.printf "%s" sep; print_list print reste sep
-
-let print_args (x,t) = Printf.printf "(%s," x; print_type t;Printf.printf ")";
 
 let rec print_type t=
   match t with 
@@ -114,24 +165,46 @@ let print_arg arg =
       Printf.printf ")"
     )
 
+
+let print_args (x,t) = Printf.printf "(%s," x; print_type t;Printf.printf ")"
+
+let print_argp ap= 
+  match ap with
+    ASTArgp(nom, typ) -> (
+      Printf.printf "(";
+      Printf.printf "%s" nom;
+      Printf.printf ",";
+      print_type typ;
+      Printf.printf ")"
+      )
+    | ASTArgpVar(nom,typ) -> (
+      Printf.printf "(";
+      Printf.printf "%s" nom;
+      Printf.printf ",";
+      print_type typ;
+      Printf.printf ")"
+      )
+
+let print_argsp (x,t) = Printf.printf "(%s," x; print_type t;Printf.printf ")"
+
 let print_def d = 
   match d with
-    ASTDefConst(nom, type, e) -> (
+    ASTDefConst(nom, ty, e) -> (
       Printf.printf "const";
       Printf.printf "(";
       Printf.printf "%s" nom;
       Printf.printf ",";
-      print_type type;
+      print_type ty;
       Printf.printf ",";
       print_expr e;
       Printf.printf ")";
     )
-  | ASTDefFun(nom, type, args, e) -> (
+  | ASTDefFun(nom, ty, args, e) -> (
       Printf.printf "fun";
       Printf.printf "(";
       Printf.printf "%s" nom;
       Printf.printf ",";
-      print_type type;
+      print_type ty;
       Printf.printf ",";
       Printf.printf "[";
       print_list print_args args ",";
@@ -140,12 +213,12 @@ let print_def d =
       print_expr e;
       Printf.printf ")";
     )
-  | ASTDefFunRec(nom, type, args, e) -> (
+  | ASTDefFunRec(nom, ty, args, e) -> (
       Printf.printf "funrec";
       Printf.printf "(";
       Printf.printf "%s" nom;
       Printf.printf ",";
-      print_type type;
+      print_type ty;
       Printf.printf ",";
       Printf.printf "[";
       print_list print_args args ",";
@@ -153,12 +226,49 @@ let print_def d =
       Printf.printf ",";
       print_expr e;
       Printf.printf ")";
+    )
+  | ASTDefVar(nom,ty)->(
+      Printf.printf "var";
+      Printf.printf "(";
+      Printf.printf "%s" nom;
+      Printf.printf ",";
+      print_type ty;
+      Printf.printf ")";
+    )
+  | ASTDefProc(x,argsp,bk)-> (
+      Printf.printf "proc";
+      Printf.printf "(";
+      Printf.printf "%s" x;
+      Printf.printf ",";
+      Printf.printf "[";
+      print_list print_argsp argsp ",";
+      Printf.printf "]";
+      Printf.printf ",";
+      print_block bk;
+      Printf.printf ")";
+    )
+  | ASTDefProcRec(x,argsp,bk)-> (
+    Printf.printf "procrec";
+    Printf.printf "(";
+    Printf.printf "%s" x;
+    Printf.printf ",";
+    Printf.printf "[";
+    print_list print_argsp argsp ",";
+    Printf.printf "]";
+    Printf.printf ",";
+    print_block bk;
+    Printf.printf ")";
   )
 
-let print_prog p =
-  Printf.printf("prog([");
-  print_cmds p;
+let print_block cs =
+  Printf.printf("block([");
+  print_cmds cs;
   Printf.printf("])")
+
+let print_prog p =
+  Printf.printf("prog(");
+  print_block p;
+  Printf.printf(")")
 ;;
 	
 let fname = Sys.argv.(1) in

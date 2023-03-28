@@ -51,9 +51,9 @@ g0([(true,bool),(false,bool),(not,fleche([bool],bool)),(eq,fleche([int,int],bool
 (lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(sub,fleche([int,int],int)),
 (mul,fleche([int,int],int)),(div,fleche([int,int],int))]).
 
-/* ref */
+/* exprp -> adr , ref */
 type_expar(G,adr(X),ref(T)):-type_expr(X,id(X),ref(T)).
-/* val */
+/* exprp -> val */
 type_expar(G,expr(E),T):-type_expr(G,E,T).
 
 /* expr -> num */
