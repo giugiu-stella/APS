@@ -9,6 +9,14 @@
 (* ========================================================================== *)
 open Ast
   
+
+let rec print_list print l sep =
+  match l with
+  [] -> ()
+  | [x] -> print x;
+  | x::reste -> print x; Printf.printf "%s" sep; print_list print reste sep
+
+
 let rec print_expr e =
   match e with
       ASTNum n -> Printf.printf "%d" n
@@ -17,7 +25,7 @@ let rec print_expr e =
       Printf.printf"app(";
       print_expr e;
       Printf.printf",[";
-      print_list print_args args ",";
+      print_list print_expr es ",";
       Printf.printf"])"
     )
     | ASTIf(cond,vrai,faux) -> (
@@ -42,7 +50,7 @@ let rec print_expr e =
       Printf.printf "abs";
       Printf.printf "(";
       Printf.printf "[";
-      print_list print_args args ",";
+      print_list print_arg args ",";
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
@@ -56,8 +64,8 @@ let rec print_expr e =
       print_expr e2;
       Printf.printf ")";
     )
-      
-let print_exprs es =
+
+and print_exprs es =
   match es with
       [] -> ()
     | [e] -> print_expr e
@@ -67,17 +75,17 @@ let print_exprs es =
 	print_exprs es
       )
 
-let rec print_exprp ep = 
+and print_exprp ep = 
   match ep with
     ASTExprpExpr(e) -> print_expr e;
-    | ASTExprpAdr(e)->(
+    | ASTExprpAdr(x)->(
       Printf.printf "adr";
       Printf.printf "(";
-      print_expr e;
+      Printf.printf "%s" x;
       Printf.printf ")";
     )
 
-let rec print_exprsp esp =
+and print_exprsp esp =
   match esp with
       [] -> ()
     | [e] -> print_exprp e
@@ -87,7 +95,7 @@ let rec print_exprsp esp =
 	print_exprsp es)
 
 
-let print_stat s =
+and print_stat s =
   match s with
       ASTEcho e -> (
         Printf.printf("echo(");
@@ -128,34 +136,29 @@ let print_stat s =
         Printf.printf ")";
         )
 
-let print_cmd c =
+and print_cmd c =
   match c with
       ASTStat s -> print_stat s
+      |_ -> failwith "not yet implemented"
 	
-let rec print_cmds cs =
+and print_cmds cs =
   match cs with
       c::[] -> print_cmd c
     | _ -> failwith "not yet implemented"
 
-let rec print_list print l sep =
-  match l with
-  [] -> ()
-  | [x] -> print x;
-  | x::reste -> print x; Printf.printf "%s" sep; print_list print reste sep
-
-let rec print_type t=
+and print_type t=
   match t with 
   ASTTypBool -> Printf.printf "bool";
   | ASTTypInt -> Printf.printf "int";
-  | ASTTypFleche(typ,typs) -> (
-      print_type typ;
-      Printf.printf ",";
+  | ASTTypFleche(typs,typ) -> (
       Printf.printf "[";
       print_list print_type typs ","; 
       Printf.printf "]";
+      Printf.printf ",";
+      print_type typ;
     )
 
-let print_arg arg = 
+and print_arg arg = 
   match arg with
     ASTArg(nom, typ) -> (
       Printf.printf "(";
@@ -166,9 +169,7 @@ let print_arg arg =
     )
 
 
-let print_args (x,t) = Printf.printf "(%s," x; print_type t;Printf.printf ")"
-
-let print_argp ap= 
+and print_argp ap= 
   match ap with
     ASTArgp(nom, typ) -> (
       Printf.printf "(";
@@ -185,9 +186,9 @@ let print_argp ap=
       Printf.printf ")"
       )
 
-let print_argsp (x,t) = Printf.printf "(%s," x; print_type t;Printf.printf ")"
 
-let print_def d = 
+
+and print_def d = 
   match d with
     ASTDefConst(nom, ty, e) -> (
       Printf.printf "const";
@@ -207,7 +208,7 @@ let print_def d =
       print_type ty;
       Printf.printf ",";
       Printf.printf "[";
-      print_list print_args args ",";
+      print_list print_arg args ",";
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
@@ -221,7 +222,7 @@ let print_def d =
       print_type ty;
       Printf.printf ",";
       Printf.printf "[";
-      print_list print_args args ",";
+      print_list print_arg args ",";
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
@@ -241,7 +242,7 @@ let print_def d =
       Printf.printf "%s" x;
       Printf.printf ",";
       Printf.printf "[";
-      print_list print_argsp argsp ",";
+      print_list print_argp argsp ",";
       Printf.printf "]";
       Printf.printf ",";
       print_block bk;
@@ -253,19 +254,19 @@ let print_def d =
     Printf.printf "%s" x;
     Printf.printf ",";
     Printf.printf "[";
-    print_list print_argsp argsp ",";
+    print_list print_argp argsp ",";
     Printf.printf "]";
     Printf.printf ",";
     print_block bk;
     Printf.printf ")";
-  )
+    )
 
-let print_block cs =
+and print_block cs =
   Printf.printf("block([");
   print_cmds cs;
   Printf.printf("])")
 
-let print_prog p =
+and print_prog p =
   Printf.printf("prog(");
   print_block p;
   Printf.printf(")")
