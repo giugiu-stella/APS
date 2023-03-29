@@ -21,6 +21,7 @@ let rec print_expr e =
   match e with
       ASTNum n -> Printf.printf "%d" n
     | ASTId x -> Printf.printf"id(%s)" x
+    | ASTBool x -> Printf.printf "%B" x
     | ASTApp(e, es) -> (
       Printf.printf"app(";
       print_expr e;
@@ -138,18 +139,24 @@ and print_stat s =
 
 and print_cmd c =
   match c with
-      ASTStat s -> print_stat s
-      |_ -> failwith "not yet implemented"
+      ASTStat(s) -> print_stat s
+      | ASTDef(d) -> print_def d
+      
 	
 and print_cmds cs =
   match cs with
       c::[] -> print_cmd c
-    | _ -> failwith "not yet implemented"
+    | c:: cbis -> 
+      print_cmd c ; 
+      Printf.printf ",";
+      print_cmds cbis;
+    | _ -> failwith "not yet implemented 2"
 
 and print_type t=
   match t with 
   ASTTypBool -> Printf.printf "bool";
   | ASTTypInt -> Printf.printf "int";
+  | ASTTypVoid ->  Printf.printf "void";
   | ASTTypFleche(typs,typ) -> (
       Printf.printf "[";
       print_list print_type typs ","; 

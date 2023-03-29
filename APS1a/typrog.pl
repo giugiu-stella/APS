@@ -1,30 +1,35 @@
+/* contexte initial */
+g0([(true,bool),(false,bool),(not,fleche([bool],bool)),(eq,fleche([int,int],bool)),
+(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(sub,fleche([int,int],int)),
+(mul,fleche([int,int],int)),(div,fleche([int,int],int))]).
+
 /* main */
-main:- read(user_input,AST),check(AST).
-check(AST):-g0(G),type_expr(G,AST,T),write("ok!").
+main:- read_term(AST,_),check(AST).
+check(AST):-type_prog(AST),write("ok!").
 check(AST):-write("nop").
-/*type_prog(AST,void).*/
 
 /* prog */
-type_prog(prog(X),void):- g0(G),type_block(G,X,void).
+type_prog(prog(X)):- g0(G),type_block(G,X).
 
 /* block */
-type_block(G,bloc(X),void):- type_cmds(G,X,void).
+type_block(G,bloc(X)):- type_cmds(G,X).
 
 /* cmds -> defs */
-type_cmds(G,[D|X],void):-type_def(G,D,G2),type_cmds(G2,X,void).
+type_cmds(G,[]).
+type_cmds(G,[D|X]):-type_def(G,D,G2),type_cmds(G2,X).
 /* cmds -> stat */
-type_cmds(G,[stat(S)|CS],void):-type_stat(G,S,void),type_cmds(G,CS,void).
+type_cmds(G,[stat(S)|CS]):-type_stat(G,S),type_cmds(G,CS).
 
 /* stat-> echo */
-type_stat(G,echo(E),void):-type_expr(G,E,int).
+type_stat(G,echo(E)):-type_expr(G,E,int).
 /* stat -> set */
-type_stat(G,set(X,E),void):-type_expr(G,id(X),ref(T)),type_expr(G,E,T).
+type_stat(G,set(X,E),G):-type_expr(G,id(X),ref(T)),type_expr(G,E,T).
 /* stat-> if */ 
-type_stat(G,if(E,BK1,BK2),void):-type_expr(G,E,bool),type_block(G,BK1,void),type_block(G,BK2,void).
+type_stat(G,if(E,BK1,BK2)):-type_expr(G,E,bool),type_block(G,BK1),type_block(G,BK2).
 /* stat -> while */
-type_stat(G,while(E,BK),void):-type_expr(G,E,bool),type_block(G,BK,void).
+type_stat(G,while(E,BK)):-type_expr(G,E,bool),type_block(G,BK).
 /* stat -> call */
-type_stat(G,call(X,EPS),void):-type_expr(G,id(X),fleche(ListT,void)),type_exprlist(G,ListE,ListT).
+type_stat(G,call(X,EPS)):-type_expr(G,id(X),fleche(ListT,unit)),type_exprlist(G,ListE,ListT).
 
 /* def -> const */
 type_def(G,const(X,T,E),[(X,T)|G]):-type_expr(G,E,T).
@@ -36,7 +41,7 @@ type_def(G,funrec(X,T,ListArg,E),[X,fleche((ListT,T)|G)]):-arg_type(ListArg,List
 type_def(G,var(X1,int),[(X1,ref(int))|G]).
 type_def(G,var(X1,bool),[(X1,ref(bool))|G]).
 /* def -> proc */
-type_def(G,proc(X,ListArg,BK),[X,fleche((ListT,void)|G)]):-fonction_orga_A(L,ListArg),recup_liste_typ(ListT,ListArg),type_block([L|G],BK,void).
+type_def(G,proc(X,ListArg,BK),[X,fleche((ListT,unit)|G)]):-fonction_orga_A(L,ListArg),recup_liste_typ(ListT,ListArg),type_block([L|G],BK).
 fonction_orga_A(Liste,[]).
 fonction_orga_A(Liste,[(var(X),T)|RL]):-fonction_orga_A([(X,ref(T))|Liste],RL).
 fonction_orga_A(Liste,[(X,T)|RL]):-fonction_orga_A([(X,T)|Liste],RL).
@@ -44,12 +49,7 @@ fonction_orga_A(Liste,[(X,T)|RL]):-fonction_orga_A([(X,T)|Liste],RL).
 recup_liste_typ(Liste,[]).
 recup_liste_typ(Liste,[(X,T)|RL]):-recup_liste_typ([T|Liste],RL).
 /* def -> proc rec */
-type_def(G,procrec(X,ListArg,BK),[X,fleche((ListT,void)|G)]):-fonction_orga_A(L,ListArg),recup_liste_typ(ListT,ListArg),type_block([L,(X,fleche((ListT,void)))|G],BK,void).
-
-/* contexte initial */
-g0([(true,bool),(false,bool),(not,fleche([bool],bool)),(eq,fleche([int,int],bool)),
-(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(sub,fleche([int,int],int)),
-(mul,fleche([int,int],int)),(div,fleche([int,int],int))]).
+type_def(G,procrec(X,ListArg,BK),[X,fleche((ListT,unit)|G)]):-fonction_orga_A(L,ListArg),recup_liste_typ(ListT,ListArg),type_block([L,(X,fleche((ListT,unit)))|G],BK).
 
 /* exprp -> adr , ref */
 type_expar(G,adr(X),ref(T)):-type_expr(X,id(X),ref(T)).
@@ -58,6 +58,9 @@ type_expar(G,expr(E),T):-type_expr(G,E,T).
 
 /* expr -> num */
 type_expr(G,N,int):-integer(N).
+/* expr -> bool */
+type_expr(G,false,bool).
+type_expr(G,true,bool).
 /* expr -> idr */
 type_expr([(X,ref(T))|G],idr(X),T).
 type_expr([(X1,T1)|G],idr(X),T):-type_expr(G,idr(X),T).

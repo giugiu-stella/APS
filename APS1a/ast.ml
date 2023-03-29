@@ -12,6 +12,7 @@
 type expr =
     ASTNum of int
   | ASTId of string
+  | ASTBool of bool
   | ASTApp of expr * expr list
   | ASTIf of expr * expr * expr 
   | ASTAnd of expr * expr 
@@ -38,8 +39,9 @@ and block = cmd list
 and prog= block
 
 and typ=
-    ASTTypBool
+    ASTTypBool 
     | ASTTypInt
+    | ASTTypVoid 
     | ASTTypFleche of typ list * typ
 	
 and arg=
