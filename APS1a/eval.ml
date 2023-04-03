@@ -1,5 +1,6 @@
 module Env = Map.Make(String)
-type value = INZ of int | INF of expr * string list * envi | INFR of value
+type value = INZ of int | INF of expr * string list * envi | INFR of value |
+             INA of int | INP of block * string list * envi | INPR of value
 and envi = value Env.t
 
 | operators op = 
@@ -60,21 +61,38 @@ and envi = value Env.t
 
 
 
-| eval_stat env w s = match s with
+| eval_stat env w s m = match s with
                     ASTEcho(e) -> (eval_expr e env)::w 
 
-| eval_def env d = match d with 
-                    | ASTDefConst(x,_,e)-> v= eval_expr env e in Env.add x v env
-                    | ASTDefFun(x,_,args,e)-> xs = List.map (fun (ASTArg (x,t))-> x) args in  f = INF(e,xs,env) in Env.add x f env 
-                    | ASTDefFunRec(x,_,args,e)-> xs = List.map (fun (ASTArg (x,t))-> x) args in f = INFR(e,x,xs,env) in Env.add x f env
+| eval_def env d m = match d with
+                    | ASTDefConst(x,_,e)-> v = eval_expr env e m
+                        in (Env.add x v env, m)
+                    | ASTDefFun(x,_,args,e)-> xs =
+                        List.map (fun (ASTArg (x,t))-> x) args in
+                        f = INF(e,xs,env) in (Env.add x f env, m)
+                    | ASTDefFunRec(x,_,args,e)-> xs =
+                        List.map (fun (ASTArg (x,t))-> x) args in
+                        f = INFR(e,x,xs,env) in (Env.add x f env, m)
+                    | ASTDefVar(x, _) -> a, m1 = alloc(m)
+                        in (Env.add x INA(a) env, m1)
+                    | ASTDefProc(x, args, b) -> xs  =
+                        List.map (fun (ASTArg (x,t))-> x) args in
+                        f = INP(b, args, env) in (Env.add x f env, m)
+                    | ASTDefProcRec(x, args, b) -> xs  =
+                        List.map (fun (ASTArg (x,t))-> x) args in
+                        f = INPR(INP(b, args, env)) in (Env.add x f env, m)
 
-| eval_cmds env w cmds = match cmds with
-                        | (ASTDef(d)::cs) -> env1= eval_def env d in 
-                            eval_cmds env1 w cs
-                        | ASTStat(s) -> eval_stat env w s 
 
+| eval_cmds env w cmds m = match cmds with
+                        | (ASTDef(d)::cs) -> (env1, m1) = eval_def env d m in
+                            eval_cmds env1 w cs m1
+                        | (ASTStat(s)::cs) -> (env1, m1) = eval_stat env w s m in
+                            eval_cmds env1 w cs m1
+                        | ASTStat(s) -> eval_stat env w s m
 
-| eval_prog prog = eval_cmds Env.empty "" prog
+| eval_block env w block m = eval_cmds env w block m
+
+| eval_prog prog = eval_cmds Env.empty "" prog []
 
 
     
