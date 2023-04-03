@@ -28,11 +28,26 @@ and envi = value Env.t
     | ASTId("MUL"),[INZ(n1);INZ(n2)] ->  INZ(e1) * INZ(e2)
     | ASTId("DIV"),[INZ(n1);INZ(n2)] ->  INZ(e1) / INZ(e2)
 
+(*renvoie la valeur de la variable stocké à l'adresse a dans la memoire m*)
+| get_mem a m =
+    match m with
+        | (a1, v1)::cs -> if(a = a1) then v1 else get_mem a cs
+        | _ -> assert false
+
+(*indice du tableau qui représente la mémoire ou on doit écrire la nouvelle valeur*)
+| index_mem = ref 0
+
+(*case mémoire -> (adresse, )*)
+| alloc m =
+    i = (!index_mem, ref(INZ(-1))) in
+        !index_mem = (!index_mem + 1);
+        i::m
+
 | lookup x env = match Env.find_opt x env with 
             | None -> assert false
             | Some v -> v
 
-| eval_expr env e = match e with 
+| eval_expr env e m = match e with
                     | ASTId("true")-> INZ(1)
                     | ASTId("false") -> INZ(0)
                     | ASTNum(n) -> INZ(n)
@@ -59,10 +74,25 @@ and envi = value Env.t
                                     |_ -> assert false)
                     
 
-
-
 | eval_stat env w s m = match s with
-                    ASTEcho(e) -> (eval_expr e env)::w 
+                    | ASTEcho(e) -> ((eval_expr e env m)::w, m)
+                    | ASTSet(x,e) -> (match lookup x env with
+                        | INA(a) -> v =
+                            (get_mem a m) and res = (eval_expr env e m) in
+                                v := res;
+                                (env, m)
+                        | assert false)
+                    | ASTIfStat(e, b1, b2) -> (match (eval_expr env e m) with
+                        | INZ(1) -> eval_block env w b1 m
+                        | INZ(0) -> eval_block env w b2 m
+                        | assert false)
+                    | ASTWhile(e, b) -> (match (eval_expr env e m) with
+                        | INZ(1) -> (env1, m1) = (eval_block env w b m) in
+                            eval_stat env1 w s m1
+                        | INZ(0) -> (env, m))
+                    | (* ASTCall(x, exprs) -> match (eval_expr env ) *)
+
+
 
 | eval_def env d m = match d with
                     | ASTDefConst(x,_,e)-> v = eval_expr env e m
