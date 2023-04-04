@@ -37,7 +37,10 @@ and envi = value Env.t
 (*indice du tableau qui représente la mémoire ou on doit écrire la nouvelle valeur*)
 | index_mem = ref 0
 
-(*case mémoire -> (adresse, )*)
+(*
+    case mémoire -> (adresse, valeur)
+    la variable est égale à -1 si aucune valeur ne lui a été affecté
+*)
 | alloc m =
     i = (!index_mem, ref(INZ(-1))) in
         !index_mem = (!index_mem + 1);
@@ -52,24 +55,24 @@ and envi = value Env.t
                     | ASTId("false") -> INZ(0)
                     | ASTNum(n) -> INZ(n)
                     | ASTId(x)-> lookup x env
-                    | ASTAnd(e1,e2) -> (match (eval_expr env e1) with 
-                                        INZ(1)-> eval_expr env e2
+                    | ASTAnd(e1,e2) -> (match (eval_expr env e1 m) with
+                                        INZ(1)-> eval_expr env e2 m
                                         | INZ(0) as v -> v 
                                         | _-> assert false) 
-                    | ASTOr(e1,e2) -> (match (eval_expr env e1) with 
-                                        INZ(0)-> eval_expr env e2
+                    | ASTOr(e1,e2) -> (match (eval_expr env e1 m) with
+                                        INZ(0)-> eval_expr env e2 m
                                         | INZ(1) as v -> v 
                                         | _-> assert false)
-                    | ASTIf(e1,e2,e3)-> (match (eval_expr env e1) with 
-                                        INZ(1)-> eval_expr env e2
-                                        | INZ(0) -> eval_expr env e3
+                    | ASTIf(e1,e2,e3)-> (match (eval_expr env e1 m) with
+                                        INZ(1)-> eval_expr env e2 m
+                                        | INZ(0) -> eval_expr env e3 m
                                         | _-> assert false )
                     | ASTFun(args, e) -> let xs = List.map (fun (ASTArg (x,t))-> x) args in INF(e,xs,env)
                     | ASTApp(e,es) ->(match (operators e) with
                                     true -> app_op e es
-                                    | false ->  (match (eval_expr env e) with 
-                                        | INF(e1,xs,env1)-> let env2=(List.fold_right2 (fun (x,e) env -> Env.add x (eval_expr env e) env) env xs es) in eval_expr e1 env2
-                                        | INF(e1,fonc,xs,env1) -> (List.fold_right2 (fun (x,e) env -> Env.add x (eval_expr env e) env) env xs es) in eval_expr e1 (Env.add fonc INFR(e1,fonc,xs,env1) env2)
+                                    | false ->  (match (eval_expr env e m) with
+                                        | INF(e1,xs,env1)-> let env2=(List.fold_right2 (fun (x,e) env -> Env.add x (eval_expr env e m) env) env xs es) in eval_expr e1 env2 m
+                                        | INF(e1,fonc,xs,env1) -> (List.fold_right2 (fun (x,e) env -> Env.add x (eval_expr env e m) env) env xs es) in eval_expr e1 (Env.add fonc INFR(e1,fonc,xs,env1) env2) m
                                         |_-> assert false)
                                     |_ -> assert false)
                     
@@ -90,7 +93,7 @@ and envi = value Env.t
                         | INZ(1) -> (env1, m1) = (eval_block env w b m) in
                             eval_stat env1 w s m1
                         | INZ(0) -> (env, m))
-                    | (* ASTCall(x, exprs) -> match (eval_expr env ) *)
+                    | (* ASTCall(x, exprs) -> *)
 
 
 
