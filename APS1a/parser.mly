@@ -22,7 +22,7 @@ open Ast
 %token TRUE FALSE
 %token AND OR ADR VAR
 %token IF ECHO CONST FUN REC
-%token DP PV V FLECHE ETOILE
+%token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
 
 %type <Ast.expr> expr
@@ -83,7 +83,8 @@ exprsp:
  typ:
  BOOL { ASTTypBool }
  |INT { ASTTypInt }
- | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) };
+ | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
+ | REF typ {ASTref($2)};
  
  typs:
  typ { [$1] }
@@ -103,7 +104,7 @@ argp:
 argps:
 	argp {[$1]}
  	| argp V argps {$1::$3};
- 	
+ 
  def:
 	CONST IDENT typ expr                  { ASTDefConst($2, $3, $4) }
   | FUN IDENT typ LBRA args RBRA expr     { ASTDefFun($2, $3, $5, $7) }

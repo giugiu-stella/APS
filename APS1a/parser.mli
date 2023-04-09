@@ -23,6 +23,7 @@ type token =
   | V
   | FLECHE
   | ETOILE
+  | REF
   | PROC
   | SET
   | WHILE

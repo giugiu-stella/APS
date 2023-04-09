@@ -66,16 +66,6 @@ let rec print_expr e =
       Printf.printf ")";
     )
 
-and print_exprs es =
-  match es with
-      [] -> ()
-    | [e] -> print_expr e
-    | e::es -> (
-	print_expr e;
-	print_char ',';
-	print_exprs es
-      )
-
 and print_exprp ep = 
   match ep with
     ASTExprpExpr(e) -> print_expr e;
@@ -85,15 +75,6 @@ and print_exprp ep =
       Printf.printf "%s" x;
       Printf.printf ")";
     )
-
-and print_exprsp esp =
-  match esp with
-      [] -> ()
-    | [e] -> print_exprp e
-    | e::es -> (
-	print_exprp e;
-	print_char ',';
-	print_exprsp es)
 
 
 and print_stat s =
@@ -133,13 +114,18 @@ and print_stat s =
         Printf.printf "(";
         Printf.printf "%s" x;
         Printf.printf ",";
-        print_exprsp eps;
+        Printf.printf"[";
+        print_list print_exprp eps ",";
+        Printf.printf"]";
         Printf.printf ")";
         )
 
 and print_cmd c =
   match c with
-      ASTStat(s) -> print_stat s
+      ASTStat(s) -> 
+        Printf.printf "stat(";
+        print_stat s;
+        Printf.printf ")";
       | ASTDef(d) -> print_def d
       
 	
@@ -158,12 +144,19 @@ and print_type t=
   | ASTTypInt -> Printf.printf "int";
   | ASTTypVoid ->  Printf.printf "void";
   | ASTTypFleche(typs,typ) -> (
+      Printf.printf "fleche(";
       Printf.printf "[";
       print_list print_type typs ","; 
       Printf.printf "]";
       Printf.printf ",";
       print_type typ;
+      Printf.printf ")";
     )
+  | ASTref(typ)-> 
+      Printf.printf "ref(";
+      print_type typ;
+      Printf.printf ")";
+
 
 and print_arg arg = 
   match arg with
@@ -186,12 +179,12 @@ and print_argp ap=
       Printf.printf ")"
       )
     | ASTArgpVar(nom,typ) -> (
+      Printf.printf "var";
       Printf.printf "(";
       Printf.printf "%s" nom;
       Printf.printf ",";
       print_type typ;
-      Printf.printf ")"
-      )
+      Printf.printf ")")
 
 
 

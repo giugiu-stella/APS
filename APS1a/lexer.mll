@@ -43,6 +43,7 @@ rule token = parse
   | "if"			 { IF }
   | "var" 			 {VAR}
   | "adr"            {ADR}
+  | "ref"			 {REF}
   | ['0'-'9']+('.'['0'-'9'])? as lxm { NUM(int_of_string lxm) }
   | ['a'-'z']['a'-'z''A'-'Z''0'-'9']* as lxm { IDENT(lxm) }
   | eof              { raise Eof }
