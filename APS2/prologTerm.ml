@@ -65,6 +65,32 @@ let rec print_expr e =
       print_expr e2;
       Printf.printf ")";
     )
+    | ASTnth(e1, e2) -> (
+      Print.printf "nth(";
+      print_expr e1;
+      Print.printf ",";
+      print_expr e2;
+      Print.printf ")";
+    )
+    | ASTLen(e) -> (
+      Print.printf "len(";
+      print_expr e;
+      Print.printf ")";
+    )
+    | ASTAlloc(e) -> (
+      Print.printf "alloc(";
+      print_expr e;
+      Print.printf ")";
+    )
+    | ASTvset(e1, e2, e3) -> (
+      Print.printf "vset(";
+      print_expr e1;
+      Print.printf ",";
+      print_expr e2;
+      Print.printf ",";
+      print_expr e3;
+      Print.printf ")";    
+      )
 
 and print_exprp ep = 
   match ep with
@@ -156,6 +182,11 @@ and print_type t=
       Printf.printf "ref(";
       print_type typ;
       Printf.printf ")";
+  | ASTTTypVec(typ) -> (
+      Print.printf "vec(";
+      print_type typ;
+      Print.printf ")";
+  )
 
 
 and print_arg arg = 
