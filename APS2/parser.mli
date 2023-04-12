@@ -28,6 +28,11 @@ type token =
   | SET
   | WHILE
   | CALL
+  | ALLOC
+  | VEC
+  | LEN
+  | NTH
+  | VSET
 
 val prog :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.cmd list

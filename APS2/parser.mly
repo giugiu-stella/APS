@@ -24,7 +24,7 @@ open Ast
 %token IF ECHO CONST FUN REC
 %token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
-%token VEC LEN NTH VSET
+%token ALLOC VEC LEN NTH VSET
 
 %type <Ast.expr> expr
 %type <Ast.expr list> exprs
@@ -68,7 +68,7 @@ expr:
 | LPAR ALLOC expr RPAR  {ASTAlloc($3)}
 | LPAR LEN expr RPAR    {ASTLen($3)}
 | LPAR NTH expr expr    {ASTnth($3, $4)}
-| LPAR VSET expr exp expr  {ASTvset($3, $4, $5)}
+| LPAR VSET expr expr expr  {ASTvset($3, $4, $5)}
 ;
 
 exprs :
@@ -92,7 +92,7 @@ exprsp:
  | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
  | REF typ {ASTref($2)};
 
- styp;
+ styp:
     BOOL                {ASTTypBool}
   | INT                 {ASTTypInt}  
   | LPAR VEC styp RPAR  {ASTTTypVec($3)}; 

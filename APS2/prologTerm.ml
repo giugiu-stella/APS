@@ -66,30 +66,30 @@ let rec print_expr e =
       Printf.printf ")";
     )
     | ASTnth(e1, e2) -> (
-      Print.printf "nth(";
+      Printf.printf "nth(";
       print_expr e1;
-      Print.printf ",";
+      Printf.printf ",";
       print_expr e2;
-      Print.printf ")";
+      Printf.printf ")";
     )
     | ASTLen(e) -> (
-      Print.printf "len(";
+      Printf.printf "len(";
       print_expr e;
-      Print.printf ")";
+      Printf.printf ")";
     )
     | ASTAlloc(e) -> (
-      Print.printf "alloc(";
+      Printf.printf "alloc(";
       print_expr e;
-      Print.printf ")";
+      Printf.printf ")";
     )
     | ASTvset(e1, e2, e3) -> (
-      Print.printf "vset(";
+      Printf.printf "vset(";
       print_expr e1;
-      Print.printf ",";
+      Printf.printf ",";
       print_expr e2;
-      Print.printf ",";
+      Printf.printf ",";
       print_expr e3;
-      Print.printf ")";    
+      Printf.printf ")";    
       )
 
 and print_exprp ep = 
@@ -183,9 +183,9 @@ and print_type t=
       print_type typ;
       Printf.printf ")";
   | ASTTTypVec(typ) -> (
-      Print.printf "vec(";
+      Printf.printf "vec(";
       print_type typ;
-      Print.printf ")";
+      Printf.printf ")";
   )
 
 
@@ -304,13 +304,13 @@ and print_prog p =
 
 and print_value v =
     match v with 
-        ASTvalueId(id) -> Print.printf "ident(%s)" id;
+        ASTvalueId(id) -> Printf.printf "ident(%s)" id;
       | ASTValue(id, e) -> 
-        (Print.printf "nth(";
+        (Printf.printf "nth(";
         print_value id;
-        Print.printf ",";
+        Printf.printf ",";
         print_expr e;
-        Print.printf ")";
+        Printf.printf ")";
         )
 ;;
 	

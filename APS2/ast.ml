@@ -21,7 +21,7 @@ type expr =
   | ASTAlloc of expr 
   | ASTLen of expr
   | ASTnth of expr * expr 
-  | ASTvset expr * expr * expr
+  | ASTvset of expr * expr * expr
 
 and exprp= 
     ASTExprpExpr of expr
@@ -67,4 +67,4 @@ and def =
 
 and lvalue = 
       ASTvalueId of string (*dans le cas où il n'y a pas d'expression*)
-    | ASTValue of string * expr
+    | ASTValue of lvalue * expr
