@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/APS1a.iml" filepath="$PROJECT_DIR$/.idea/APS1a.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/APS_ocaml.iml" filepath="$PROJECT_DIR$/.idea/APS_ocaml.iml" />
     </modules>
   </component>
 </project>
