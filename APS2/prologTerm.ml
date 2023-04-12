@@ -113,7 +113,7 @@ and print_stat s =
       | ASTSet(x,e)-> 
         Printf.printf("set");
         Printf.printf "(";
-        Printf.printf "%s" x;
+        print_value x;
         print_char ',';
         print_expr e;
         Printf.printf ")";
@@ -301,6 +301,17 @@ and print_prog p =
   Printf.printf("prog(");
   print_block p;
   Printf.printf(")")
+
+and print_value v =
+    match v with 
+        ASTvalueId(id) -> Print.printf "ident(%s)" id;
+      | ASTValue(id, e) -> 
+        (Print.printf "nth(";
+        print_value id;
+        Print.printf ",";
+        print_expr e;
+        Print.printf ")";
+        )
 ;;
 	
 let fname = Sys.argv.(1) in

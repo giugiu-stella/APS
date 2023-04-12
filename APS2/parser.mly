@@ -49,7 +49,7 @@ cmds:
 
 stat:
   ECHO expr             { ASTEcho($2) }
-  | SET IDENT expr      { ASTSet($2,$3)}
+  | SET lvalue expr      { ASTSet($2,$3)}
   | IF expr block block {ASTIfStat($2,$3,$4)}
   | WHILE expr block    { ASTWhile($2,$3)}
   | CALL IDENT exprsp {ASTCall($2,$3)}

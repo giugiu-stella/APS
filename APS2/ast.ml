@@ -29,7 +29,7 @@ and exprp=
 
 and stat = 
     ASTEcho of expr
-    | ASTSet of string * expr
+    | ASTSet of lvalue * expr
     | ASTIfStat of expr * block * block 
     | ASTWhile of expr * block 
     | ASTCall of string * exprp list
