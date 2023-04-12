@@ -44,6 +44,7 @@ rule token = parse
   | "var" 			 {VAR}
   | "adr"            {ADR}
   | "ref"			 {REF}
+  | "alloc"   {ALLOC}
   | "vec"     {VEC}
   | "len"     {LEN}
   | "nth"     {NTH}

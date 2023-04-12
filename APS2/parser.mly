@@ -30,6 +30,7 @@ open Ast
 %type <Ast.expr list> exprs
 %type <Ast.cmd list> cmds
 %type <Ast.cmd list> prog
+%type <Ast.lvalue> lvalue
 
 %start prog
 
@@ -64,6 +65,10 @@ expr:
 | LPAR OR expr expr RPAR	{ASTOr($3,$4)}
 | LBRA args RBRA expr		{ASTFun($2,$4)}
 | LPAR expr exprs RPAR  { ASTApp($2, $3) }
+| LPAR ALLOC expr RPAR  {ASTAlloc($3)}
+| LPAR LEN expr RPAR    {ASTLen($3)}
+| LPAR NTH expr expr    {ASTnth($3, $4)}
+| LPAR VSET expr exp expr  {ASTvset($3, $4, $5)}
 ;
 
 exprs :
@@ -86,6 +91,11 @@ exprsp:
  |INT { ASTTypInt }
  | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
  | REF typ {ASTref($2)};
+
+ styp;
+    BOOL                {ASTTypBool}
+  | INT                 {ASTTypInt}  
+  | LPAR VEC styp RPAR  {ASTTTypVec($3)}; 
  
  typs:
  typ { [$1] }
@@ -114,5 +124,9 @@ argps:
   | PROC IDENT LBRA argps RBRA block       { ASTDefProc($2,$4,$6)}
   | PROC REC IDENT LBRA argps RBRA block   { ASTDefProcRec($3,$5,$7)}
   ;
+
+lvalue:
+    IDENT                     {ASTvalueId($1)}
+  | LPAR NTH lvalue expr RPAR   {ASTValue($3, $4)};
  
 

@@ -18,6 +18,10 @@ type expr =
   | ASTAnd of expr * expr 
   | ASTFun of arg list * expr
   | ASTOr of expr * expr
+  | ASTAlloc of expr 
+  | ASTLen of expr
+  | ASTnth of expr * expr 
+  | ASTvset expr * expr * expr
 
 and exprp= 
     ASTExprpExpr of expr
@@ -60,10 +64,7 @@ and def =
   | ASTDefVar of string * typ
   | ASTDefProc of string * argp list * block
   | ASTDefProcRec of string * argp list * block
-  | ASTAlloc of expr 
-  | ASTLen of expr
-  | ASTnth of expr * expr 
-  | ASTvset expr * expr * expr
 
 and lvalue = 
-    ASTValue of string * expr
+      ASTvalueId of string (*dans le cas où il n'y a pas d'expression*)
+    | ASTValue of string * expr
