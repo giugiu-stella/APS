@@ -79,6 +79,8 @@ type_expr(G,N,ref(int)):-write("num ref \n"),write(N),write("\n"),integer(N).
 /* expr -> bool */
 type_expr(G,false,bool).
 type_expr(G,true,bool).
+/* expr -> id ref*/
+type_expr([(X,ref(T))|G],id(X),T).
 /* expr -> id */
 type_expr([(X,T)|G],id(X),T):-write(X),write(" "),write(T).
 type_expr([(X1,T1)|G],id(X),T):-write("whattt\n"),write(T1),write("\n"),write(G),write("oh\n"),type_expr(G,id(X),T).
@@ -88,6 +90,10 @@ type_expr(G,if(A,B,C),T):-write("if expr\n"),type_expr(G,A,bool),write("if expr 
 type_expr(G,or(A,B),bool):-type_expr(G,A,bool),type_expr(G,B,bool).
 /* expr -> and */
 type_expr(G,and(A,B),bool):-type_expr(G,A,bool),type_expr(G,B,bool).
+/*expr -> not*/
+type_expr(G,not(A),bool):-type_expr(G,A,bool).
+/* expr -> binary*/
+type_expr(G,op(nom,A,B),T):-type_expr(G,A,TA),type_expr(G,B,TB),type_expr(G,nom,fleche([TA,TB],T)).
 /* expr -> abs */
 type_expr(G,abs(ListArg,E),fleche(ListT,T2)):-write("abs\n"),arg_type(ListArg,ListT),write("abs etape2\n"),env_extend(G,ListArg,G2),write("abs etape3\n"),type_expr(G2,E,T2).
 env_extend(G,[],G).

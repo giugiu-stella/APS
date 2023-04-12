@@ -21,6 +21,8 @@ open Ast
 %token INT BOOL 
 %token TRUE FALSE
 %token AND OR ADR VAR
+%token PLUS MINUS TIMES DIV
+%token EQ LT NOT 
 %token IF ECHO CONST FUN REC
 %token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
@@ -63,6 +65,13 @@ expr:
 | LPAR OR expr expr RPAR	{ASTOr($3,$4)}
 | LBRA args RBRA expr		{ASTFun($2,$4)}
 | LPAR expr exprs RPAR  { ASTApp($2, $3) }
+| LPAR NOT expr RPAR        { ASTNot($3) }
+| LPAR PLUS expr expr RPAR  { ASTBinary(Ast.Add, $3, $4) }
+| LPAR MINUS expr expr RPAR { ASTBinary(Ast.Sub, $3, $4) }
+| LPAR TIMES expr expr RPAR { ASTBinary(Ast.Mul, $3, $4) }
+| LPAR DIV expr expr RPAR   { ASTBinary(Ast.Div, $3, $4) }
+| LPAR EQ expr expr RPAR    { ASTBinary(Ast.Eq, $3, $4) }
+| LPAR LT expr expr RPAR    { ASTBinary(Ast.Lt, $3, $4) }
 ;
 
 exprs :

@@ -65,6 +65,31 @@ let rec print_expr e =
       print_expr e2;
       Printf.printf ")";
     )
+    | ASTBinary(op, e1, e2) ->(
+      Printf.printf "op(";
+      Printf.printf "%s" (op_to_string op);
+      Printf.printf ",";
+      print_expr e1;
+      Printf.printf ",";
+      print_expr e2;
+      Printf.printf ")";
+    )
+  | ASTNot(e) -> (
+      Printf.printf "not" ;
+      Printf.printf "(";
+      print_expr e;
+      Printf.printf ")";
+    )
+
+
+and op_to_string op = 
+  match op with
+    Add -> "add"
+  | Mul -> "mul"
+  | Sub -> "sub"
+  | Div -> "div"
+  | Eq -> "eq"
+  | Lt -> "lt"
 
 and print_exprp ep = 
   match ep with

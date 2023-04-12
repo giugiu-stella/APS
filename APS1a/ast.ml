@@ -18,6 +18,10 @@ type expr =
   | ASTAnd of expr * expr 
   | ASTFun of arg list * expr
   | ASTOr of expr * expr
+  | ASTBinary of ops * expr * expr
+  | ASTNot of expr 
+
+and ops = Add | Mul | Sub | Div | Eq | Lt 
 
 and exprp= 
     ASTExprpExpr of expr

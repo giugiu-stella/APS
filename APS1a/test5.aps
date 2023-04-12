@@ -1,5 +1,5 @@
 [
 PROC f [n:int] [
   ECHO n];
-  CALL f 42
+  CALL f 42 
 ]
