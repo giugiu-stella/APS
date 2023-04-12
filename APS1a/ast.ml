@@ -43,6 +43,7 @@ and typ=
     | ASTTypInt
     | ASTTypVoid 
     | ASTTypFleche of typ list * typ
+    | ASTref of typ
 	
 and arg=
     ASTArg of string * typ
