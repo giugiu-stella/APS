@@ -25,7 +25,7 @@ and ops = Add | Mul | Sub | Div | Eq | Lt
 
 and exprp= 
     ASTExprpExpr of expr
-    | ASTExprpAdr of string
+    | ASTExprpAdr of expr
 
 and stat = 
     ASTEcho of expr
@@ -63,3 +63,4 @@ and def =
   | ASTDefVar of string * typ
   | ASTDefProc of string * argp list * block
   | ASTDefProcRec of string * argp list * block
+

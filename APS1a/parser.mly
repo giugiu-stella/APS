@@ -81,7 +81,7 @@ exprs :
 
 exprp:
 	expr 	{ ASTExprpExpr($1)}
-	| LPAR ADR IDENT RPAR {ASTExprpAdr($3)}
+	| LPAR ADR expr RPAR {ASTExprpAdr($3)}
 ;
 	
 exprsp:
@@ -123,4 +123,3 @@ argps:
   | PROC REC IDENT LBRA argps RBRA block   { ASTDefProcRec($3,$5,$7)}
   ;
  
-
