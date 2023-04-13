@@ -29,7 +29,7 @@ type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_s
 /* stat-> echo */
 type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),type_expr(G,E,int).
 /* stat -> set */
-type_stat(G,set(X,E),void):-write("set \n"),write(G),type_expr(G,id(X),ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
+type_stat(G,set(E1,E2),void):-write("set \n"),write(G),type_value(G,E1,T),write("set etapege 2\n"),write(E),type_expr(G,E2,T),write("fin set\n").
 /* stat-> if */ 
 type_stat(G,if(E,BK1,BK2),void):-write("if\n"),write(G),type_expr(G,E,bool),write("\n"),write("if etape2\n"),type_block(G,BK1,void),write("if etape3\n"),type_block(G,BK2,void),write("fin if\n").
 /* stat -> while */
@@ -72,7 +72,6 @@ write(G2),write("\n"),write(" proc rec etape4 \n"),type_block([(X,fleche(L,void)
 type_expar(G,adr(X),ref(T)):-write("expar adr \n"),write(E),write(T),type_expr(X,id(X),ref(T)).
 /* exprp -> val */
 type_expar(G,E,T):-write("expar val \n"),write(E),write(T),write("\n"),type_expr(G,E,T),write("fin expar val\n").
-
 /* expr -> num */
 type_expr(G,N,int):-write("num int \n"),write(N),write("\n"),integer(N),write("fin num int\n").
 type_expr(G,N,ref(int)):-write("num ref \n"),write(N),write("\n"),integer(N).
@@ -98,3 +97,15 @@ arg_type([(X,T)|RL],[T|ListT]):-write("deb arg typ\n"),arg_type(RL,ListT),write(
 type_expr(G,app(E,ListE),T):-write("app\n"),write(ListE),write("\n"),type_expr(G,E,fleche(ListT,T)),write("app etape2\n"),write(G),write("\n erreur : "),write(ListT),write("\n"),type_exprlist(G,ListE,ListT),write("fin app\n").
 type_exprlist(G,[],[]).
 type_exprlist(G,[L1|RL],[T1|RT]):-write(L1),write(T1),write("\n"),type_expr(G,L1,T1),type_exprlist(G,RL,RT).
+/* expr -> alloc */
+type_expr(G, alloc(E), type_vect(T)) :- type_expr(G, E, int).
+/* expr -> len */
+type_expr(G, len(E), int) :- type_expr(G, E, type_vect(T)).
+/* expr -> nth */
+type_expr(G, nth(E1, E2), T) :- type_expr(G, E1, type_vect(T)), type_expr(G, E2, int).
+/* expr -> vset */
+type_expr(G, vset(E1, E2, E3), type_vect(T)) :- type_expr(G, E1, type_vect(T)), type_expr(G, E2, int), type_expr(G, E3, T).
+/* lvalue -> lvar */
+type_value(G, X, T) :- type_expr(X, id(X), ref(T)).
+/* lvalue -> lnth */
+type_value(G, nth(E1, E2), T) :- type_expr(G, E1, type_vect(T)), type_expr(G, E2, int).
