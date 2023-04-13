@@ -1,39 +1,15 @@
 
 open Ast
 
-module Env = Map.Make(
-    struct 
-      type t = string    
-      let compare = compare 
-    end     
-)
-
-type value = INZ of int | INF of expr * string list * envi | INFR of expr * string * string list * envi |
-             INA of int | INP of block * string list * envi | INPR of value
-and envi = value Env.t
+type value = INZ of int | INF of expr * string list * (string * value) list | INFR of expr * string * string list * (string * value) list |
+             INA of int | INP of block * string list * (string * value) list | INPR of value
 
 
-(*let lookup x env =
-    match Env.find_opt x env with 
-        | None -> assert false
-        | Some v -> v*)
 
 let lookup x env =
   try List.assoc x env with 
   Not_found -> failwith "lookup: variable not found in environment"
 
-let app_op operator vs =
-    match operator,vs with
-    ASTId("NOT"),[INZ(n)] -> if(n==1) then INZ(0) 
-                            else if(n==0) then INZ(1)
-                                else assert false            
-    | ASTId("EQ"),[INZ(n1);INZ(n2)] -> if(n1==n2)then INZ(1) else INZ(0)
-    | ASTId("LT"),[INZ(n1);INZ(n2)] ->  if(n1<n2)then INZ(1) else INZ(0)
-    | ASTId("ADD"),[INZ(n1);INZ(n2)] ->  INZ(n1 + n2)
-    | ASTId("SUB"),[INZ(n1);INZ(n2)] ->  INZ(n1 - n2)
-    | ASTId("MUL"),[INZ(n1);INZ(n2)] ->  INZ(n1 * n2)
-    | ASTId("DIV"),[INZ(n1);INZ(n2)] ->  INZ(n1 / n2)
-    |_-> raise Not_found
 
 (*renvoie la valeur de la variable stocké à l'adresse a dans la memoire m*)
 let rec get_mem a m =
@@ -53,6 +29,26 @@ let alloc m =
         index_mem := (!index_mem + 1);
         i::m
 
+let eval_ops op e1 e2 =
+    match op with
+    | Eq -> match e1,e2 with 
+            INZ(n1),INZ(n2)-> if(n1==n2)then INZ(1) else INZ(0)
+            |_->failwith "error EQ"
+    | Lt -> match e1,e2 with 
+        INZ(n1),INZ(n2)-> if(n1<n2)then INZ(1) else INZ(0)
+        |_->failwith "error LT"
+    | Add ->  match e1,e2 with 
+            INZ(n1),INZ(n2)-> INZ(n1 + n2)
+            |_->failwith "error ADD"
+    | Sub ->  match e1,e2 with 
+            INZ(n1),INZ(n2)-> INZ(n1 - n2)
+            |_->failwith "error SUB"
+    | Mul ->  match e1,e2 with 
+            INZ(n1),INZ(n2)-> INZ(n1 * n2)
+            |_->failwith "error MUL"
+    | Div ->  match e1,e2 with 
+            INZ(n1),INZ(n2)-> INZ(n1 / n2)
+            |_->failwith "error DIV"
 
 let rec eval_expr env e m = match e with
                     | ASTBool(true)-> INZ(1)
@@ -73,21 +69,25 @@ let rec eval_expr env e m = match e with
                                         INZ(1)-> eval_expr env e2 m
                                         | INZ(0) -> eval_expr env e3 m
                                         | _-> assert false)
-                   (* |ASTFun(args, e) ->let xs = List.map (fun ASTArg(x,t) -> x) args in
-                                        INF(e, xs, env) 
-                    | ASTApp(e,es) ->( let suite = List.map (fun x -> eval_expr env x m) es in 
-                                     try (app_op e suite) with
-                                    | Not_found -> (match (eval_expr env e m) with
-                                        |INF(e1, xs, env1) ->
+                    |ASTFun(args, e) ->let xs = List.map (fun (ASTArg(x,t)) -> x) args in
+                                        INF(e,xs,env) 
+                    | ASTApp(e,es) ->((match (eval_expr env e m) with
+                                        INF(e1, xs, env1) ->
                                             let env2 = List.fold_right2
-                                              (fun x e env_acc -> Env.add x (eval_expr env e m) env_acc)
+                                              (fun x elem env_acc -> env_acc@[x,(eval_expr env elem m)])
                                               xs es env1 in
-                                            eval_expr e1 env2 m
+                                            eval_expr env2 e1 m
                                         | INFR(e1,fonc,xs,env1) -> 
-                                            let env2 = (List.fold_right2 (fun x e env1_acc -> Env.add x e env1_acc) xs es env1) in 
-                                            eval_expr e1 (Env.add fonc (INFR(e1,fonc,xs,env1)) env2) m)                                        
-                                    )*)
-                    
+                                            let env2 = (List.fold_right2 (fun x elem env_acc -> env_acc@[x,(eval_expr env elem m)]) xs es env1) in 
+                                            eval_expr (env2@[fonc,INFR(e1,fonc,xs,env1)]) e1 m)                                        
+                                    )
+                    | ASTNot(el)-> let n = eval_expr env el m in if(n==INZ(1)) then INZ(0) 
+                                        else if(n==INZ(0)) then INZ(1)
+                                        else failwith "error not"
+
+                    |ASTBinary(op,e1,e2) -> let elem1 = eval_expr env e1 m in
+                                            let elem2 = eval_expr env e2 m
+                                    in eval_ops op elem1 elem2
 
 let eval_expar env m e = match e with 
                         ASTExprpAdr(x)-> eval_expr env x m
