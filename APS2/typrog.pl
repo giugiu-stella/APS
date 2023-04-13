@@ -52,7 +52,7 @@ recup_type([var(X, T) | RL], [ref(T) | TypeL]) :-recup_type(RL, TypeL).
 /* def -> fun rec */
 type_def(G,funrec(X,T,ListArg,E),[(X,fleche(ListT,T))|G]):-recup_type(ListArg,ListT),env_extend(G,ListArg,G2),type_expr([(X,fleche(ListT,T))|G2],E,T).
 /* def -> var */
-type_def(G,var(X1,T),[(X1,ref(T))|G]):-write("aled\n").
+type_def(G,var(X1,T),[(X1,ref(T))|G]):- write("aled\n").
 /* def -> proc */
 type_def(G,proc(X,ListArg,BK),[(X,fleche(L,void))|G]):-
 write("proc \n"),write(G),recup_liste_typ(ListT,ListArg,L),write("\n"),write(ListT),
@@ -105,7 +105,7 @@ type_expr(G, len(E), int) :- type_expr(G, E, type_vect(T)).
 type_expr(G, nth(E1, E2), T) :- type_expr(G, E1, type_vect(T)), type_expr(G, E2, int).
 /* expr -> vset */
 type_expr(G, vset(E1, E2, E3), type_vect(T)) :- type_expr(G, E1, type_vect(T)), type_expr(G, E2, int), type_expr(G, E3, T).
-/* lvalue -> lvar */
+/* lvalue -> l */
 type_value(G, X, T) :- type_expr(X, id(X), ref(T)).
 /* lvalue -> lnth */
 type_value(G, nth(E1, E2), T) :- type_expr(G, E1, type_vect(T)), type_expr(G, E2, int).

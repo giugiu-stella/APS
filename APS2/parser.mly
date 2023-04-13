@@ -67,8 +67,8 @@ expr:
 | LPAR expr exprs RPAR  { ASTApp($2, $3) }
 | LPAR ALLOC expr RPAR  {ASTAlloc($3)}
 | LPAR LEN expr RPAR    {ASTLen($3)}
-| LPAR NTH expr expr    {ASTnth($3, $4)}
-| LPAR VSET expr expr expr  {ASTvset($3, $4, $5)}
+| LPAR NTH expr expr RPAR   {ASTnth($3, $4)}
+| LPAR VSET expr expr expr RPAR  {ASTvset($3, $4, $5)}
 ;
 
 exprs :
@@ -120,7 +120,7 @@ argps:
 	CONST IDENT typ expr                  { ASTDefConst($2, $3, $4) }
   | FUN IDENT typ LBRA args RBRA expr     { ASTDefFun($2, $3, $5, $7) }
   | FUN REC IDENT typ LBRA args RBRA expr { ASTDefFunRec($3,$4,$6,$8) }
-  | VAR IDENT typ 						  { ASTDefVar($2,$3)}
+  | VAR IDENT styp 						  { ASTDefVar($2,$3)}
   | PROC IDENT LBRA argps RBRA block       { ASTDefProc($2,$4,$6)}
   | PROC REC IDENT LBRA argps RBRA block   { ASTDefProcRec($3,$5,$7)}
   ;
