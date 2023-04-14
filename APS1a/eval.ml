@@ -31,24 +31,13 @@ let alloc m =
 
 let eval_ops op e1 e2 =
     match op with
-    | Eq -> match e1,e2 with 
-            INZ(n1),INZ(n2)-> if(n1==n2)then INZ(1) else INZ(0)
-            |_->failwith "error EQ"
-    | Lt -> match e1,e2 with 
-        INZ(n1),INZ(n2)-> if(n1<n2)then INZ(1) else INZ(0)
-        |_->failwith "error LT"
-    | Add ->  match e1,e2 with 
-            INZ(n1),INZ(n2)-> INZ(n1 + n2)
-            |_->failwith "error ADD"
-    | Sub ->  match e1,e2 with 
-            INZ(n1),INZ(n2)-> INZ(n1 - n2)
-            |_->failwith "error SUB"
-    | Mul ->  match e1,e2 with 
-            INZ(n1),INZ(n2)-> INZ(n1 * n2)
-            |_->failwith "error MUL"
-    | Div ->  match e1,e2 with 
-            INZ(n1),INZ(n2)-> INZ(n1 / n2)
-            |_->failwith "error DIV"
+    | Eq -> let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1==n2)then INZ(1) 
+                            else INZ(0)
+    | Lt ->let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1<n2)then INZ(1) else INZ(0)
+    | Add ->  let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 + n2)
+    | Sub -> let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 - n2)
+    | Mul -> let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 * n2)
+    | Div -> let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 / n2)
 
 let rec eval_expr env e m = match e with
                     | ASTBool(true)-> INZ(1)
@@ -89,19 +78,23 @@ let rec eval_expr env e m = match e with
                                             let elem2 = eval_expr env e2 m
                                     in eval_ops op elem1 elem2
 
-let eval_expar env m e = match e with 
+and eval_expar env m e = match e with 
                         ASTExprpAdr(x)-> eval_expr env x m
                         | ASTExprpExpr(v) -> eval_expr env v m
                         |_ -> failwith "error expar"
 
-let rec eval_stat env w s m = match s with
-                    | ASTEcho(e) -> (match (eval_expr e env m) with 
-                                    (INZ(n),m2)-> (m2,n::w) 
+and eval_stat env w s m = match s with
+                    | ASTEcho(e) -> (match (eval_expr env e m) with 
+                                    INZ(n)-> (m,n::w) 
                                     |_ -> failwith "error echo pas INZ")
-                    | ASTSet(x,e) -> (match (lookup x env) with
-                                    INA(a) -> let v = (get_mem a m) and res = (eval_expr env e m) in v := res;
-                                            (m,w)
-                                    |_-> assert false)
+                    | ASTSet(x,e) -> (
+                        match (lookup x env) with
+                            | INA(a) -> 
+                                let v = (get_mem a m) and res = eval_expr env e m
+                                in v := res;
+                                (m,w)
+                            | _ -> failwith ("address not in memory")
+                        )
                     | ASTIfStat(e, b1, b2) -> (match (eval_expr env e m) with
                         | INZ(1) -> eval_block env w b1 m
                         | INZ(0) -> eval_block env w b2 m
@@ -115,7 +108,7 @@ let rec eval_stat env w s m = match s with
                                         | INPR(bk,x,xs,env1) ->  let env2=(List.fold_right2 (fun (x,e) env -> Env.add x (eval_expar env e m) env) env xs es) in eval_block (Env.add fonc INFR(e1,fonc,xs,env1) env2) w bk m
 
 
-let eval_def env d m = match d with
+and eval_def env d m = match d with
                     | ASTDefConst(x,_,e)-> let v = eval_expr env e m
                         in (Env.add x v env, m)
                     | ASTDefFun(x,_,args,e)-> let xs =
@@ -134,16 +127,16 @@ let eval_def env d m = match d with
                         let f = INPR(b, xs, env) in (Env.add x f env, m)
 
 
-let rec eval_cmds env w cmds m = match cmds with
+and eval_cmds env w cmds m = match cmds with
                         | (ASTDef(d)::cs) -> let (env1, m1) = eval_def env d m in
                             eval_cmds env1 w cs m1
                         | (ASTStat(s)::cs) -> let (env1, m1) = eval_stat env w s m in
                             eval_cmds env1 w cs m1
                         | ASTStat(s) -> eval_stat env w s m
 
-let eval_block env w block m = eval_cmds env w block m
+and eval_block env w block m = eval_cmds env w block m
 
-let eval_prog prog = eval_block Env.empty "" prog []
+and eval_prog prog = eval_block Env.empty "" prog []
 
 
     
