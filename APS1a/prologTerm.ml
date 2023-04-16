@@ -39,14 +39,6 @@ let rec print_expr e =
       print_expr faux;
       Printf.printf ")";
     )
-    | ASTAnd(e1,e2) -> (
-      Printf.printf "and";
-      Printf.printf "(";
-      print_expr e1;
-      Printf.printf ",";
-      print_expr e2;
-      Printf.printf ")";
-    )
     | ASTFun(args,e) -> (
       Printf.printf "abs";
       Printf.printf "(";
@@ -55,14 +47,6 @@ let rec print_expr e =
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
-      Printf.printf ")";
-    )
-    | ASTOr(e1,e2) -> (
-      Printf.printf "or";
-      Printf.printf "(";
-      print_expr e1;
-      Printf.printf ",";
-      print_expr e2;
       Printf.printf ")";
     )
     | ASTBinary(op, e1, e2) ->(
@@ -90,6 +74,8 @@ and op_to_string op =
   | Div -> "div"
   | Eq -> "eq"
   | Lt -> "lt"
+  | And -> "and"
+  | Or -> "or"
 
 and print_exprp ep = 
   match ep with

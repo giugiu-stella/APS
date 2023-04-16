@@ -15,13 +15,11 @@ type expr =
   | ASTBool of bool
   | ASTApp of expr * expr list
   | ASTIf of expr * expr * expr 
-  | ASTAnd of expr * expr 
   | ASTFun of arg list * expr
-  | ASTOr of expr * expr
   | ASTBinary of ops * expr * expr
   | ASTNot of expr 
 
-and ops = Add | Mul | Sub | Div | Eq | Lt 
+and ops = Add | Mul | Sub | Div | Eq | Lt | Or | And
 
 and exprp= 
     ASTExprpExpr of expr
@@ -32,7 +30,7 @@ and stat =
     | ASTSet of string * expr
     | ASTIfStat of expr * block * block 
     | ASTWhile of expr * block 
-    | ASTCall of string * exprp list
+    | ASTCall of expr * exprp list
 
 and cmd =
     ASTStat of stat
