@@ -21,7 +21,7 @@ type token =
   | EQ
   | LT
   | NOT
-  | IF
+  | IFBK
   | CONST
   | FUN
   | REC
@@ -33,6 +33,7 @@ type token =
   | REF
   | PROC
   | SET
+  | IF
   | WHILE
   | CALL
 

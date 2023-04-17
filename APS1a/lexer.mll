@@ -14,7 +14,7 @@
 
 }
 rule token = parse
-    [' ' '\t' '\n']       { token lexbuf }     (* skip blanks *)
+    [' ' '\t' '\n''\r']       { token lexbuf }     (* skip blanks *)
   | '['              { LBRA }
   | ']'              { RBRA }
   | '('              { LPAR }
@@ -31,7 +31,7 @@ rule token = parse
   | "VAR"			 { VAR }
   | "PROC"			 {PROC}
   | "SET"			 {SET}
-  | "IF"			 {IF}
+  | "IFBK"			 {IFBK}
   | "WHILE"          {WHILE}
   | "CALL"           {CALL}
   | "true"			 { TRUE }

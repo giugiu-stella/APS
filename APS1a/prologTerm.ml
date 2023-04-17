@@ -50,12 +50,14 @@ let rec print_expr e =
       Printf.printf ")";
     )
     | ASTBinary(op, e1, e2) ->(
-      Printf.printf "op(";
+      Printf.printf "app(id(";
       Printf.printf "%s" (op_to_string op);
-      Printf.printf ",";
+      Printf.printf "),";
+      Printf.printf "[";
       print_expr e1;
       Printf.printf ",";
       print_expr e2;
+      Printf.printf "]";
       Printf.printf ")";
     )
   | ASTNot(e) -> (
@@ -83,7 +85,7 @@ and print_exprp ep =
     | ASTExprpAdr(x)->(
       Printf.printf "adr";
       Printf.printf "(";
-      Printf.printf "%s" x;
+      print_expr x;
       Printf.printf ")";
     )
 
@@ -91,19 +93,19 @@ and print_exprp ep =
 and print_stat s =
   match s with
       ASTEcho e -> (
-        Printf.printf("echo(");
-        print_expr(e);
-        Printf.printf(")")
+        Printf.printf "echo(";
+        print_expr e;
+        Printf.printf ")"
         )
       | ASTSet(x,e)-> 
-        Printf.printf("set");
+        Printf.printf "set";
         Printf.printf "(";
         Printf.printf "%s" x;
-        print_char ',';
+        Printf.printf ",";
         print_expr e;
         Printf.printf ")";
       | ASTIfStat(e,bk1,bk2)-> (
-        Printf.printf "if";
+        Printf.printf "ifbk";
         Printf.printf "(";
         print_expr e;
         Printf.printf ",";
@@ -123,7 +125,7 @@ and print_stat s =
       | ASTCall(x,eps)->(
         Printf.printf "call";
         Printf.printf "(";
-        Printf.printf "%s" x;
+        print_expr x;
         Printf.printf ",";
         Printf.printf"[";
         print_list print_exprp eps ",";
@@ -137,17 +139,11 @@ and print_cmd c =
         Printf.printf "stat(";
         print_stat s;
         Printf.printf ")";
-      | ASTDef(d) -> print_def d
+      | ASTDef(d) -> 
+        Printf.printf "def(";
+        print_def d;
+        Printf.printf ")";
       
-	
-and print_cmds cs =
-  match cs with
-      c::[] -> print_cmd c
-    | c:: cbis -> 
-      print_cmd c ; 
-      Printf.printf ",";
-      print_cmds cbis;
-    | _ -> failwith "not yet implemented 2"
 
 and print_type t=
   match t with 
@@ -274,7 +270,7 @@ and print_def d =
 
 and print_block cs =
   Printf.printf("block([");
-  print_cmds cs;
+  print_list print_cmd cs ",";
   Printf.printf("])")
 
 and print_prog p =

@@ -9,7 +9,7 @@
 
 LEX_ML = ocamllex
 YACC_ML = /usr/local/bin/ocamlyacc
-YACC_ML_WINDOWS = ocamlyacc
+YACC_ML= ocamlyacc
 OCAMLC = ocamlc
 
 all: prologTerm eval
@@ -23,7 +23,7 @@ prologTerm: parser prologTerm.ml
 parser: ast.ml lexer.mll parser.mly eval.ml
 	$(OCAMLC) -c ast.ml
 	$(LEX_ML) -o lexer.ml lexer.mll
-	$(YACC_ML_WINDOWS) -b parser parser.mly
+	$(YACC_ML) -b parser parser.mly
 	$(OCAMLC) -c parser.mli
 	$(OCAMLC) -c lexer.ml
 	$(OCAMLC) -c parser.ml

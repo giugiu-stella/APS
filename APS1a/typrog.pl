@@ -22,7 +22,7 @@ type_block(G,block(X),void):- write("block \n"),write(G),write("\n"),type_cmds(G
 /* cmds -> end */
 type_cmds(G,[],void).
 /* cmds -> defs */
-type_cmds(G,[D|X],void):-write("cmd def \n"),type_def(G,D,G2),type_cmds(G2,X,void).
+type_cmds(G,[def(D)|X],void):-write("cmd def \n"),type_def(G,D,G2),type_cmds(G2,X,void).
 /* cmds -> stat */
 type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_stat(G,S,void),type_cmds(G,CS,void).
 
@@ -31,11 +31,11 @@ type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),type_expr(G,E
 /* stat -> set */
 type_stat(G,set(X,E),void):-write("set \n"),write(G),type_expr(G,id(X),ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
 /* stat-> if */ 
-type_stat(G,if(E,BK1,BK2),void):-write("if\n"),write(G),type_expr(G,E,bool),write("\n"),write("if etape2\n"),type_block(G,BK1,void),write("if etape3\n"),type_block(G,BK2,void),write("fin if\n").
+type_stat(G,ifbk(E,BK1,BK2),void):-write("ifbk\n"),write(G),write("\n"),write(E),type_expr(G,E,bool),write(T),write("\n"),write("ifbk etape2\n"),type_block(G,BK1,void),write("ifbk etape3\n"),type_block(G,BK2,void),write("fin ifbk\n").
 /* stat -> while */
 type_stat(G,while(E,BK),void):-type_expr(G,E,bool),type_block(G,BK,void).
 /* stat -> call */
-type_stat(G,call(X,EPS),void):-write("call \n"),write(G),write("\n"),write(X),write("\n"),type_expr(G,id(X),fleche(ListT,void)),write(" call etape2 \n"),write(EPS),write("\n"),write(ListT),write("\n"),type_exparlist(G,EPS,ListT).
+type_stat(G,call(X,EPS),void):-write("call \n"),write(G),write("\n"),write(X),write("\n"),type_expr(G,X,fleche(ListT,void)),write(" call etape2 \n"),write(EPS),write("\n"),write(ListT),write("\n"),type_exparlist(G,EPS,ListT).
 type_exparlist(G,[],[]).
 type_exparlist(G,[L1|RL],[T1|RT]):-write("exparlist \n"),write(L1),write(T1),write("\n"),type_expar(G,L1,T1),type_exparlist(G,RL,RT).
 /* def -> const */
@@ -77,23 +77,16 @@ type_expar(G,E,T):-write("expar val \n"),write(E),write(T),write("\n"),type_expr
 type_expr(G,N,int):-write("num int \n"),write(N),write("\n"),integer(N),write("fin num int\n").
 type_expr(G,N,ref(int)):-write("num ref \n"),write(N),write("\n"),integer(N).
 /* expr -> bool */
-type_expr(G,false,bool).
-type_expr(G,true,bool).
+type_expr(G,false,bool):-write("ici\n").
+type_expr(G,true,bool)-write("là\n").
 /* expr -> id ref*/
-type_expr([(X,ref(T))|G],id(X),T).
+type_expr([(X,ref(T))|G],id(X),T):-write("id ref\n")
 /* expr -> id */
-type_expr([(X,T)|G],id(X),T):-write(X),write(" "),write(T).
-type_expr([(X1,T1)|G],id(X),T):-write("whattt\n"),write(T1),write("\n"),write(G),write("oh\n"),type_expr(G,id(X),T).
+type_expr([(X,T)|G],id(X),T):-write("pourquoi?"),write("id "),write(X),write(" "),write(T).
+type_expr([(X1,T1)|G],id(X),T):-write("whattt\n"),write(X1),write(T1),write("\n"),write(G),write("oh\n"),type_expr(G,id(X),T).
 /* expr -> if */
 type_expr(G,if(A,B,C),T):-write("if expr\n"),type_expr(G,A,bool),write("if expr etape2\n"),type_expr(G,B,T),write("if expr etape3\n"),type_expr(G,C,T),write("fin if expr\n").
-/* expr -> or */
-type_expr(G,or(A,B),bool):-type_expr(G,A,bool),type_expr(G,B,bool).
-/* expr -> and */
-type_expr(G,and(A,B),bool):-type_expr(G,A,bool),type_expr(G,B,bool).
-/*expr -> not*/
-type_expr(G,not(A),bool):-type_expr(G,A,bool).
-/* expr -> binary*/
-type_expr(G,op(nom,A,B),T):-type_expr(G,A,TA),type_expr(G,B,TB),type_expr(G,nom,fleche([TA,TB],T)).
+
 /* expr -> abs */
 type_expr(G,abs(ListArg,E),fleche(ListT,T2)):-write("abs\n"),arg_type(ListArg,ListT),write("abs etape2\n"),env_extend(G,ListArg,G2),write("abs etape3\n"),type_expr(G2,E,T2).
 env_extend(G,[],G).
