@@ -23,7 +23,7 @@ open Ast
 %token AND OR ADR VAR
 %token PLUS MINUS TIMES DIV
 %token EQ LT NOT 
-%token IFBK  ECHO CONST FUN REC
+%token IF ECHO CONST FUN REC
 %token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
 
@@ -50,7 +50,7 @@ cmds:
 stat:
   ECHO expr             { ASTEcho($2) }
   | SET IDENT expr      { ASTSet($2,$3)}
-  | IFBK expr block block {ASTIfStat($2,$3,$4)}
+  | IF expr block block {ASTIfStat($2,$3,$4)}
   | WHILE expr block    { ASTWhile($2,$3)}
   | CALL expr exprsp {ASTCall($2,$3)}
 ;

@@ -22,7 +22,7 @@ type_block(G,block(X),void):- write("block \n"),write(G),write("\n"),type_cmds(G
 /* cmds -> end */
 type_cmds(G,[],void).
 /* cmds -> defs */
-type_cmds(G,[def(D)|X],void):-write("cmd def \n"),type_def(G,D,G2),type_cmds(G2,X,void).
+type_cmds(G,[def(D)|X],void):-write("cmd def \n"),type_def(G,D,G2),write(G2),write("\n"),type_cmds(G2,X,void).
 /* cmds -> stat */
 type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_stat(G,S,void),type_cmds(G,CS,void).
 
@@ -80,7 +80,8 @@ type_expr(G,N,ref(int)):-write("num ref \n"),write(N),write("\n"),integer(N).
 type_expr(G,false,bool):-write("ici\n").
 type_expr(G,true,bool)-write("là\n").
 /* expr -> id ref*/
-type_expr([(X,ref(T))|G],id(X),T):-write("id ref\n")
+type_expr([(X,ref(T))|G],arg(X),ref(T)):-write("arg pour set\n").
+type_expr([(X,ref(T))|G],id(X),T):-write("id ref\n").
 /* expr -> id */
 type_expr([(X,T)|G],id(X),T):-write("pourquoi?"),write("id "),write(X),write(" "),write(T).
 type_expr([(X1,T1)|G],id(X),T):-write("whattt\n"),write(X1),write(T1),write("\n"),write(G),write("oh\n"),type_expr(G,id(X),T).

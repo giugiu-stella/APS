@@ -31,7 +31,7 @@ rule token = parse
   | "VAR"			 { VAR }
   | "PROC"			 {PROC}
   | "SET"			 {SET}
-  | "IFBK"			 {IFBK}
+  | "IF"			 {IF}
   | "WHILE"          {WHILE}
   | "CALL"           {CALL}
   | "true"			 { TRUE }

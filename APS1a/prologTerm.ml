@@ -61,10 +61,10 @@ let rec print_expr e =
       Printf.printf ")";
     )
   | ASTNot(e) -> (
-      Printf.printf "not" ;
-      Printf.printf "(";
+      Printf.printf "app(" ;
+      Printf.printf "id(not), [";
       print_expr e;
-      Printf.printf ")";
+      Printf.printf "])";
     )
 
 
@@ -99,9 +99,9 @@ and print_stat s =
         )
       | ASTSet(x,e)-> 
         Printf.printf "set";
-        Printf.printf "(";
+        Printf.printf "(arg(";
         Printf.printf "%s" x;
-        Printf.printf ",";
+        Printf.printf "),";
         print_expr e;
         Printf.printf ")";
       | ASTIfStat(e,bk1,bk2)-> (
