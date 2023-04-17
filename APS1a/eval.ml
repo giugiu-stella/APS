@@ -81,14 +81,14 @@ and eval_stat env w s m = match s with
                     | ASTEcho(e) -> (match (eval_expr env e m) with 
                                     INZ(n)-> (m,n::w) 
                                     |_ -> failwith "error echo pas INZ")
-                  (*  | ASTSet(x,e) -> (
+                    | ASTSet(x,e) -> (
                         match (lookup x env) with
                             | INA(a) -> 
                                 let v = (get_mem a m) and res = eval_expr env e m
                                 in v := res;
                                 (m,w)
                             | _ -> failwith ("address not in memory")
-                        ) *)
+                        ) 
                     | ASTIfStat(e, b1, b2) -> (match (eval_expr env e m) with
                         | INZ(1) -> eval_block env w b1 m
                         | INZ(0) -> eval_block env w b2 m
@@ -134,7 +134,10 @@ and eval_cmds env w (cmds: Ast.cmd list)  m = match cmds with
 
 and eval_block env w block m = eval_cmds env w block m
 
-and eval_prog prog = eval_block [] [] prog []
+and  print_output output =
+    List.iter (function x -> Printf.printf "%d\n" x) output
+
+and eval_prog prog = let (_, out) = eval_block [] [] prog [] in print_output out
 
 
     
