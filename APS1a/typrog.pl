@@ -73,16 +73,18 @@ type_expar(G,adr(X),ref(T)):-write("expar adr \n"),write(E),write(T),type_expr(X
 /* exprp -> val */
 type_expar(G,E,T):-write("expar val \n"),write(E),write(T),write("\n"),type_expr(G,E,T),write("fin expar val\n").
 
+
 /* expr -> num */
 type_expr(G,N,int):-write("num int \n"),write(N),write("\n"),integer(N),write("fin num int\n").
 type_expr(G,N,ref(int)):-write("num ref \n"),write(N),write("\n"),integer(N).
 /* expr -> bool */
 type_expr(G,false,bool):-write("ici\n").
-type_expr(G,true,bool)-write("là\n").
+type_expr(G,true,bool):-write("là\n").
 /* expr -> id ref*/
-type_expr([(X,ref(T))|G],arg(X),ref(T)):-write("arg pour set\n").
 type_expr([(X,ref(T))|G],id(X),T):-write("id ref\n").
 /* expr -> id */
+type_expr([(X,ref(T))|G],arg(X),ref(T)):-write("arg pour set\n").
+type_expr([(X1,T1)|G],arg(X),ref(T)):-write("arg pour set pas premier\n"),write(X),write(X1),type_expr(G,arg(X),ref(T)).
 type_expr([(X,T)|G],id(X),T):-write("pourquoi?"),write("id "),write(X),write(" "),write(T).
 type_expr([(X1,T1)|G],id(X),T):-write("whattt\n"),write(X1),write(T1),write("\n"),write(G),write("oh\n"),type_expr(G,id(X),T).
 /* expr -> if */
