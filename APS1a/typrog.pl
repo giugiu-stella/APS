@@ -29,7 +29,7 @@ type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_s
 /* stat-> echo */
 type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),type_expr(G,E,int).
 /* stat -> set */
-type_stat(G,set(X,E),void):-write("set \n"),write(G),type_expr(G,id(X),ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
+type_stat(G,set(X,E),void):-write("set \n"),write(G),type_expr(G,X,ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
 /* stat-> if */ 
 type_stat(G,ifbk(E,BK1,BK2),void):-write("ifbk\n"),write(G),write("\n"),write(E),type_expr(G,E,bool),write(T),write("\n"),write("ifbk etape2\n"),type_block(G,BK1,void),write("ifbk etape3\n"),type_block(G,BK2,void),write("fin ifbk\n").
 /* stat -> while */
