@@ -45,7 +45,7 @@ let rec eval_expr env e m = match e with
                     | ASTBool(true)-> INZ(1)
                     | ASTBool(false) -> INZ(0)
                     | ASTNum(n) -> INZ(n)
-                    | ASTId(x)-> (match (lookup x env) with
+                    | ASTId(x)-> (Printf.printf "id\n"; match (lookup x env) with
                                 INA(a)-> !(get_mem a m)
                                 | v -> v)
                     | ASTIf(e1,e2,e3)-> (match (eval_expr env e1 m) with
@@ -72,8 +72,8 @@ let rec eval_expr env e m = match e with
                                     in eval_ops op elem1 elem2
 
 and eval_expar env m e = match e with 
-                        ASTExprpAdr(x)->Printf.printf "expar adr x \n";  eval_expr env x m
-                        | ASTExprpExpr(v) -> Printf.printf "expar v \n"; eval_expr env v m
+                        ASTExprpAdr(ASTId(x))->Printf.printf "expar adr \n"; lookup x env
+                        | ASTExprpExpr(v) -> Printf.printf "expar v\n"; eval_expr env v m
                         |_ -> failwith "error expar"
 
 and eval_stat env w s m = match s with
