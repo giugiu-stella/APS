@@ -1,6 +1,5 @@
 
 open Ast
-
 type value = INZ of int | INF of expr * string list * (string * value) list | INFR of expr * string * string list * (string * value) list |
              INA of int | INP of block * string list * (string * value) list | INPR of block * string * string list * (string * value) list 
 
@@ -54,7 +53,7 @@ let rec eval_expr env e m = match e with
                                         | INZ(0) -> eval_expr env e3 m)
                     |ASTFun(args, e) ->let xs = List.map (fun (ASTArg(x,t)) -> x) args in
                                         INF(e,xs,env) 
-                    | ASTApp(e,es) ->((match (eval_expr env e m) with
+                    | ASTApp(e,es) ->Printf.printf "app\n"; ((match (eval_expr env e m) with
                                         INF(e1, xs, env1) ->
                                             let env2 = List.fold_right2
                                               (fun x elem env_acc -> env_acc@[x,(eval_expr env elem m)])
@@ -73,8 +72,8 @@ let rec eval_expr env e m = match e with
                                     in eval_ops op elem1 elem2
 
 and eval_expar env m e = match e with 
-                        ASTExprpAdr(x)-> eval_expr env x m
-                        | ASTExprpExpr(v) -> eval_expr env v m
+                        ASTExprpAdr(x)->Printf.printf "expar adr x \n";  eval_expr env x m
+                        | ASTExprpExpr(v) -> Printf.printf "expar v \n"; eval_expr env v m
                         |_ -> failwith "error expar"
 
 and eval_stat env w s m = match s with
@@ -89,7 +88,7 @@ and eval_stat env w s m = match s with
                                 (m,w)
                             | _ -> failwith ("address not in memory")
                         ) 
-                    | ASTIfStat(e, b1, b2) -> (match (eval_expr env e m) with
+                    | ASTIfStat(e, b1, b2) -> Printf.printf "set\n"; (match (eval_expr env e m) with
                         | INZ(1) -> eval_block env w b1 m
                         | INZ(0) -> eval_block env w b2 m
                         |_-> assert false)
@@ -97,28 +96,29 @@ and eval_stat env w s m = match s with
                         | INZ(1) -> let (m1, w1) = (eval_block env w b m) in
                             eval_stat env w1 (ASTWhile(e, b)) m1
                         | INZ(0) -> (m, w))
-                    | ASTCall(x, exprs) -> match (eval_expr env x m) with
+                    | ASTCall(x, exprs) -> Printf.printf " call\n";
+                                         match (eval_expr env x m) with
                                         INP(bk,xs,env1) -> let env2=(List.fold_right2 
                                         (fun x e env -> env@[x,(eval_expar env m e)]) 
                                         xs exprs env) 
                                         in eval_block env2 w bk m
-                                        | INPR(bk,x,xs,env1) ->  let env2=(List.fold_right2 (fun x e env -> env@[x,(eval_expar env m e)]) xs exprs env) 
+                                        | INPR(bk,x,xs,env1) -> Printf.printf "call INPR\n";  let env2=(List.fold_right2 (fun x e env -> env@[x,(eval_expar env m e)]) xs exprs env) 
                                     in eval_block (env2@[x,INPR(bk,x,xs,env1)]) w bk m
 
 and eval_def env d m = match d with
                     | ASTDefConst(x,_,e)-> (env@[x,(eval_expr env e m)],m)
-                    | ASTDefFun(x,_,args,e)-> let xs =
+                    | ASTDefFun(x,_,args,e)-> Printf.printf "fun\n"; let xs =
                         List.map (fun (ASTArg (x,t))-> x) args in
                         let f = INF(e,xs,env) in (env@[x,f],m)
                     | ASTDefFunRec(x,_,args,e)-> let xs =
                         List.map (fun (ASTArg (x,t))-> x) args in
                         let f = INFR(e,x,xs,env) in (env@[x,f],m)
-                    | ASTDefVar(x,_) -> let(a,m1) = alloc(m)
+                    | ASTDefVar(x,_) -> Printf.printf "var\n"; let(a,m1) = alloc(m)
                         in (env@[x,INA(a)],m1)
                     | ASTDefProc(x,args, b) -> let xs  =
                         List.map (fun (ASTArgp (x,t))-> x) args in
                         let f = INP(b, xs, env) in (env@[x,f],m)
-                    | ASTDefProcRec(x,args, b) -> let xs  =
+                    | ASTDefProcRec(x,args, b) -> Printf.printf "proc rec\n";let xs  =
                         List.map (fun (ASTArgp (x,t))-> x) args in
                         let f = INPR(b,x, xs, env) in (env@[x,f],m)
 
@@ -126,18 +126,20 @@ and eval_cmd_stat env w (cmd: Ast.stat) m = eval_stat env w cmd m
 
 and eval_cmd_def env w (cmd: Ast.def) m = eval_def env cmd m
 
-and eval_cmds env w (cmds: Ast.cmd list)  m = match cmds with
-                        | (ASTStat(s)::cs) -> let (m1, w1) = eval_cmd_stat env w s m in
+and eval_cmds env w (cmds: Ast.cmd list)  m =match cmds with
+                        | (ASTStat(s)::cs) -> let (m1, w1) = Printf.printf "cmds_stat\n"; eval_cmd_stat env w s m in
                             eval_cmds env w1 cs m1
-                        | (ASTDef(d)::cs) -> let (env1, m1) = eval_cmd_def env w d m in
+                        | (ASTDef(d)::cs) -> let (env1, m1) =Printf.printf "cmds_def\n";  eval_cmd_def env w d m in
                             eval_cmds env1 w cs m1
+                        |[]-> (m,w)
+                         
 
-and eval_block env w block m = eval_cmds env w block m
+and eval_block env w block m = Printf.printf "block\n"; eval_cmds env w block m
 
 and  print_output output =
     List.iter (function x -> Printf.printf "%d\n" x) output
 
-and eval_prog prog = let (_, out) = eval_block [] [] prog [] in print_output out
+and eval_prog prog = Printf.printf "prog\n"; let (_, out) = eval_block [] [] prog [] in print_output out
 
 let _ =
 	try

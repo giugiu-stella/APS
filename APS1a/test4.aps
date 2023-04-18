@@ -1,6 +1,6 @@
 [
   VAR r int;
-  FUN le bool [x:int,y:int] (or (eq x y) (lt x y));
+  FUN le bool [x:int] (or (eq x r) (lt x r));
   PROC REC loop [f: (int -> int), n:int]
   [
       IF (eq n 0)
@@ -9,7 +9,8 @@
         ]
 	      [
 	        SET r (add r 1);
-	        CALL loop f (sub n 1)
+	        CALL loop (le (sub n 1)) n
+	        
 	      ]
   ];
   SET r 21;
