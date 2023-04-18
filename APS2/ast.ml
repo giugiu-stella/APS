@@ -10,30 +10,31 @@
 
 
 type expr =
-    ASTNum of int
-  | ASTId of string
-  | ASTBool of bool
-  | ASTApp of expr * expr list
-  | ASTIf of expr * expr * expr 
-  | ASTAnd of expr * expr 
-  | ASTFun of arg list * expr
-  | ASTOr of expr * expr
-  | ASTAlloc of expr 
-  | ASTLen of expr
-  | ASTnth of expr * expr 
-  | ASTvset of expr * expr * expr
+ASTNum of int
+| ASTId of string
+| ASTBool of bool
+| ASTApp of expr * expr list
+| ASTIf of expr * expr * expr 
+| ASTFun of arg list * expr
+| ASTBinary of ops * expr * expr
+| ASTNot of expr
+| ASTAlloc of expr 
+| ASTLen of expr 
+| ASTnth of expr * expr 
+| ASTvset of expr * expr * expr 
+
+and ops = Add | Mul | Sub | Div | Eq | Lt | Or | And
 
 and exprp= 
     ASTExprpExpr of expr
-    | ASTExprpAdr of string
+    | ASTExprpAdr of expr
 
 and stat = 
     ASTEcho of expr
     | ASTSet of lvalue * expr
     | ASTIfStat of expr * block * block 
     | ASTWhile of expr * block 
-    | ASTCall of string * exprp list
-
+    | ASTCall of expr * exprp list
 and cmd =
     ASTStat of stat
     | ASTDef of def 

@@ -20,7 +20,7 @@ open Ast
 %token ECHO
 %token INT BOOL 
 %token TRUE FALSE
-%token AND OR ADR VAR
+%token AND OR ADR VAR NOT PLUS MINUS DIV EQ LT TIMES
 %token IF ECHO CONST FUN REC
 %token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
@@ -52,19 +52,26 @@ stat:
   | SET lvalue expr      { ASTSet($2,$3)}
   | IF expr block block {ASTIfStat($2,$3,$4)}
   | WHILE expr block    { ASTWhile($2,$3)}
-  | CALL IDENT exprsp {ASTCall($2,$3)}
+  | CALL expr exprsp {ASTCall($2,$3)}
 ;
 
 expr:
-  NUM                   { ASTNum($1) }
+    NUM                   { ASTNum($1) }
 | IDENT                 { ASTId($1) }
 | FALSE					{ ASTBool(false)}
 | TRUE					{ ASTBool(true)}
 | LPAR IF expr expr expr RPAR 	{ASTIf($3,$4,$5)}
-| LPAR AND expr expr RPAR	{ASTAnd($3,$4)}
-| LPAR OR expr expr RPAR	{ASTOr($3,$4)}
 | LBRA args RBRA expr		{ASTFun($2,$4)}
 | LPAR expr exprs RPAR  { ASTApp($2, $3) }
+| LPAR NOT expr RPAR        { ASTNot($3) }
+| LPAR PLUS expr expr RPAR  { ASTBinary(Ast.Add, $3, $4) }
+| LPAR MINUS expr expr RPAR { ASTBinary(Ast.Sub, $3, $4) }
+| LPAR TIMES expr expr RPAR { ASTBinary(Ast.Mul, $3, $4) }
+| LPAR DIV expr expr RPAR   { ASTBinary(Ast.Div, $3, $4) }
+| LPAR EQ expr expr RPAR    { ASTBinary(Ast.Eq, $3, $4) }
+| LPAR LT expr expr RPAR    { ASTBinary(Ast.Lt, $3, $4) }
+| LPAR AND expr expr RPAR	{ ASTBinary(Ast.And,$3,$4)}
+| LPAR OR expr expr RPAR	{ ASTBinary(Ast.Or,$3,$4)}
 | LPAR ALLOC expr RPAR  {ASTAlloc($3)}
 | LPAR LEN expr RPAR    {ASTLen($3)}
 | LPAR NTH expr expr RPAR   {ASTnth($3, $4)}
@@ -78,7 +85,7 @@ exprs :
 
 exprp:
 	expr 	{ ASTExprpExpr($1)}
-	| LPAR ADR IDENT RPAR {ASTExprpAdr($3)}
+	| LPAR ADR expr RPAR {ASTExprpAdr($3)}
 ;
 	
 exprsp:
@@ -86,21 +93,21 @@ exprsp:
 	| exprp exprsp { $1::$2 }
 ;
 
- typ:
- BOOL { ASTTypBool }
- |INT { ASTTypInt }
- | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
- | REF typ {ASTref($2)};
-
- styp:
+styp:
     BOOL                {ASTTypBool}
   | INT                 {ASTTypInt}  
-  | LPAR VEC styp RPAR  {ASTTTypVec($3)}; 
- 
+  | LPAR VEC styp RPAR  {ASTTTypVec($3)};
+
  typs:
  typ { [$1] }
  | typ ETOILE typs {$1::$3};
  
+ typ:
+ styp {[$1]}
+ | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
+ | REF typ {ASTref($2)};
+
+  
  arg:
  IDENT DP typ {ASTArg($1,$3)};
  
