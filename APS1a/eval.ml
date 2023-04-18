@@ -139,6 +139,14 @@ and  print_output output =
 
 and eval_prog prog = let (_, out) = eval_block [] [] prog [] in print_output out
 
+let _ =
+	try
+		let fl = open_in Sys.argv.(1) in
+		let lexbuf = Lexing.from_channel fl in
+		let p = Parser.prog Lexer.token lexbuf in
+			(eval_prog p)
+	with Lexer.Eof -> exit 0
+
 
     
 
