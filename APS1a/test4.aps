@@ -1,19 +1,7 @@
 [
-  VAR r int;
-  FUN le bool [x:int] (or (eq x r) (lt x r));
-  PROC REC loop [f: (int -> int), n:int]
-  [
-      IF (eq n 0)
-        [ 
-          ECHO r
-        ]
-	      [
-	        SET r (add r 1);
-	        CALL loop (le (sub n 1)) n
-	        
-	      ]
-  ];
-  SET r 21;
-  FUN func int [x:int] (addi x 1);
-  CALL loop func 21
+  PROC inc [var x:int] [ SET x (add x 1) ];
+  VAR n int;
+  SET n 41;
+  CALL inc (adr n);
+  ECHO n
 ]

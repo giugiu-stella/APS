@@ -63,8 +63,8 @@ let rec eval_expr env e m = match e with
                                             let env2 = (List.fold_right2 (fun x elem env_acc -> env_acc@[x,(eval_expr env elem m)]) xs es env1) in 
                                             eval_expr (env2@[fonc,INFR(e1,fonc,xs,env1)]) e1 m)                                        
                                     )
-                    | ASTNot(el)-> let n = eval_expr env el m in if(n==INZ(1)) then INZ(0) 
-                                        else if(n==INZ(0)) then INZ(1)
+                    | ASTNot(el)-> let n = eval_expr env el m in if(n=INZ(1)) then INZ(0) 
+                                        else if(n=INZ(0)) then INZ(1)
                                         else failwith "error not"
 
                     |ASTBinary(op,e1,e2) -> let elem1 = eval_expr env e1 m in
@@ -80,7 +80,7 @@ and eval_stat env w s m = match s with
                     | ASTEcho(e) -> (match (eval_expr env e m) with 
                                     INZ(n)-> (m,n::w) 
                                     |_ -> failwith "error echo pas INZ")
-                    | ASTSet(x,e) -> (
+                    | ASTSet(x,e) -> (Printf.printf "set \n";
                         match (lookup x env) with
                             | INA(a) -> 
                                 let v = (get_mem a m) and res = eval_expr env e m
@@ -116,10 +116,15 @@ and eval_def env d m = match d with
                     | ASTDefVar(x,_) -> Printf.printf "var\n"; let(a,m1) = alloc(m)
                         in (env@[x,INA(a)],m1)
                     | ASTDefProc(x,args, b) -> let xs  =
-                        List.map (fun (ASTArgp (x,t))-> x) args in
+                        List.map (fun argp -> match argp with
+                            ASTArgp (x,t)-> x
+                            |ASTArgpVar(x,t)-> x) 
+                            args in
                         let f = INP(b, xs, env) in (env@[x,f],m)
                     | ASTDefProcRec(x,args, b) -> Printf.printf "proc rec\n";let xs  =
-                        List.map (fun (ASTArgp (x,t))-> x) args in
+                        List.map (fun argp -> match argp with
+                                            ASTArgp (x,t)-> x
+                                            |ASTArgpVar(x,t)-> x) args in
                         let f = INPR(b,x, xs, env) in (env@[x,f],m)
 
 and eval_cmd_stat env w (cmd: Ast.stat) m = eval_stat env w cmd m
