@@ -21,7 +21,7 @@ open Ast
 %token INT BOOL 
 %token TRUE FALSE
 %token AND OR ADR VAR NOT PLUS MINUS DIV EQ LT TIMES
-%token IF ECHO CONST FUN REC
+%token IF ECHO CONST FUN REC VOID
 %token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
 %token ALLOC VEC LEN NTH VSET
@@ -103,9 +103,10 @@ styp:
  | typ ETOILE typs {$1::$3};
  
  typ:
- styp {$1}
+ styp {ASTStyp($1)}
  | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
  | REF typ {ASTref($2)};
+ | VOID   {ASTTypVoid}
 
   
  arg:

@@ -22,7 +22,7 @@ open Ast
 %token TRUE FALSE
 %token AND OR ADR VAR
 %token PLUS MINUS TIMES DIV
-%token EQ LT NOT 
+%token EQ LT NOT VOID
 %token IF ECHO CONST FUN REC
 %token DP PV V FLECHE ETOILE REF
 %token VAR PROC SET IF WHILE CALL
@@ -92,6 +92,7 @@ exprsp:
  typ:
  BOOL { ASTTypBool }
  |INT { ASTTypInt }
+ |VOID {ASTTypVoid}
  | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
  | REF typ {ASTref($2)};
  

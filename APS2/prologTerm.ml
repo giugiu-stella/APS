@@ -175,11 +175,22 @@ and print_cmds cs =
       print_cmds cbis;
     | _ -> failwith "not yet implemented 2"
 
+
+
+and print_stype t = 
+      match t with
+      ASTTypBool -> Printf.printf "bool";
+      | ASTTypInt -> Printf.printf "int";
+      | ASTTTypVec(typ) -> (
+      Printf.printf "vec(";
+      print_stype typ;
+      Printf.printf ")";
+      )
+
+
 and print_type t=
-  match t with 
-  ASTTypBool -> Printf.printf "bool";
-  | ASTTypInt -> Printf.printf "int";
-  | ASTTypVoid ->  Printf.printf "void";
+  match t with
+  ASTTypVoid ->  Printf.printf "void";
   | ASTTypFleche(typs,typ) -> (
       Printf.printf "fleche(";
       Printf.printf "[";
@@ -193,11 +204,7 @@ and print_type t=
       Printf.printf "ref(";
       print_type typ;
       Printf.printf ")";
-  | ASTTTypVec(typ) -> (
-      Printf.printf "vec(";
-      print_type typ;
-      Printf.printf ")";
-  )
+  | ASTStyp(typ)-> print_stype typ;
 
 
 and print_arg arg = 
@@ -275,7 +282,7 @@ and print_def d =
       Printf.printf "(";
       Printf.printf "%s" nom;
       Printf.printf ",";
-      print_type ty;
+      print_stype ty;
       Printf.printf ")";
     )
   | ASTDefProc(x,argsp,bk)-> (

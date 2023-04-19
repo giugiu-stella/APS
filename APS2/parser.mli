@@ -25,6 +25,7 @@ type token =
   | CONST
   | FUN
   | REC
+  | VOID
   | DP
   | PV
   | V

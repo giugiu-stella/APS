@@ -29,7 +29,7 @@ type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_s
 /* stat-> echo */
 type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),type_expr(G,E,int).
 /* stat -> set */
-type_stat(G,set(X,E),void):-write("set \n"),write(G),type_expr(G,X,ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
+type_stat(G,set(X,E),void):-write("set \n"),write(G),type_lvalue(G,X,ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
 /* stat-> if */ 
 type_stat(G,ifbk(E,BK1,BK2),void):-write("ifbk\n"),write(G),write("\n"),write(E),type_expr(G,E,bool),write(T),write("\n"),write("ifbk etape2\n"),type_block(G,BK1,void),write("ifbk etape3\n"),type_block(G,BK2,void),write("fin ifbk\n").
 /* stat -> while */
@@ -52,7 +52,8 @@ recup_type([var(X, T) | RL], [ref(T) | TypeL]) :-recup_type(RL, TypeL).
 /* def -> fun rec */
 type_def(G,funrec(X,T,ListArg,E),[(X,fleche(ListT,T))|G]):-recup_type(ListArg,ListT),env_extend(G,ListArg,G2),type_expr([(X,fleche(ListT,T))|G2],E,T).
 /* def -> var */
-type_def(G,var(X1,T),[(X1,ref(T))|G]):-write("aled\n").
+type_def(G,var(X1,bool),[(X1,ref(bool))|G]):-write("aled bool\n").
+type_def(G,var(X1,int),[(X1,ref(int))|G]):-write("aled int\n").
 /* def -> proc */
 type_def(G,proc(X,ListArg,BK),[(X,fleche(L,void))|G]):-
 write("proc \n"),write(G),recup_liste_typ(ListT,ListArg,L),write("\n"),write(ListT),
@@ -81,6 +82,7 @@ type_expr(G,false,bool):-write("ici\n").
 type_expr(G,true,bool):-write("là\n").
 /* expr -> id ref*/
 type_expr([(X,ref(T))|G],id(X),T):-write("id ref\n").
+type_expr([(X,vec(T))|G],id(X),T):-write("id ref\n").
 /* expr -> id */
 type_expr([(X,ref(T))|G],arg(X),ref(T)):-write("arg pour set\n").
 type_expr([(X1,T1)|G],arg(X),ref(T)):-write("arg pour set pas premier\n"),write(X),write(X1),type_expr(G,arg(X),ref(T)).
@@ -99,3 +101,15 @@ arg_type([(X,T)|RL],[T|ListT]):-write("deb arg typ\n"),arg_type(RL,ListT),write(
 type_expr(G,app(E,ListE),T):-write("app\n"),write(ListE),write("\n"),type_expr(G,E,fleche(ListT,T)),write("app etape2\n"),write(G),write("\n erreur : "),write(ListT),write("\n"),type_exprlist(G,ListE,ListT),write("fin app\n").
 type_exprlist(G,[],[]).
 type_exprlist(G,[L1|RL],[T1|RT]):-write(L1),write(T1),write("\n"),type_expr(G,L1,T1),type_exprlist(G,RL,RT).
+/* expr -> alloc */
+type_expr(G,alloc(E),vec(T)):-type_expr(G,E,int).
+/* expr -> len */
+type_expr(G,len(E),int):-type_expr(G,E,vec(T)).
+/* expr -> nth */
+type_expr(G,nth(E1,E2),T):-type_expr(G,E1,vec(T)),type_expr(G,E2,int).
+/* expr -> vset */
+type_expr(G,vset(E1,E2,E3),T):-type_expr(G,E1,vec(T)),type_expr(G,E2,int),type_expr(G,E3,T).
+
+/* lvalue */
+type_lvalue(G,ident(ID),T):-type_expr(G,id(ID),T).
+type_lvalue(G,nth(X,E),T):-type_expr(G,X,vec(T)),type_expr(G,E,T).

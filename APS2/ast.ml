@@ -43,13 +43,16 @@ and block = cmd list
 
 and prog= block
 
-and typ=
+and styp=
     ASTTypBool 
     | ASTTypInt
-    | ASTTypVoid 
-    | ASTTypFleche of typ list * typ
+    | ASTTTypVec of styp 
+
+and typ=
+    ASTStyp of styp
+    |ASTTypFleche of typ list * typ
     | ASTref of typ
-    | ASTTTypVec of typ 
+    | ASTTypVoid 
 	
 and arg=
     ASTArg of string * typ
@@ -62,7 +65,7 @@ and def =
     ASTDefConst of string * typ * expr
   | ASTDefFun of string * typ * arg list * expr
   | ASTDefFunRec of string * typ * arg list * expr
-  | ASTDefVar of string * typ
+  | ASTDefVar of string * styp
   | ASTDefProc of string * argp list * block
   | ASTDefProcRec of string * argp list * block
 

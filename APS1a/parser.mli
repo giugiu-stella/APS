@@ -21,6 +21,7 @@ type token =
   | EQ
   | LT
   | NOT
+  | VOID
   | IF
   | CONST
   | FUN
