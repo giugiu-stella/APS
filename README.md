@@ -16,7 +16,26 @@ Une courte description du projet et de ses objectifs.
 
 
 ## APS1a
-- extension : print 
+- extension : nous avons rajouté un printer dans l'évaluateur qui nous permet de visualiser le résultat et nous assurer que notre évaluateur est correct.
+```
+and  print_output output =
+    List.iter (function x -> Printf.printf "%d\n" x) output
+```
+Par exemple, prenons le test.aps suivant :
+```
+[
+VAR x int;
+SET x 0;
+ECHO x
+SET x 2;
+ECHO x
+]
+```
+dans le terminal nous obtiendrons : 
+```
+2
+0
+```
 - choix d'implémentation : ident = expr, mémoire
 - 
 
