@@ -70,5 +70,5 @@ and def =
   | ASTDefProcRec of string * argp list * block
 
 and lvalue = 
-      ASTvalueId of string (*dans le cas où il n'y a pas d'expression*)
+      ASTvalueId of string 
     | ASTValue of lvalue * expr

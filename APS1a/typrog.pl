@@ -1,6 +1,6 @@
 /* contexte initial */
 g0([(true,bool),(false,bool),(not,fleche([bool],bool)),(eq,fleche([int,int],bool)),
-(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(addi,fleche([int,int],int)),(sub,fleche([int,int],int)),
+(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(or,fleche([bool,bool],bool)),(and,fleche([bool,bool],bool)),(sub,fleche([int,int],int)),
 (mul,fleche([int,int],int)),(div,fleche([int,int],int))]).
 
 /* main */
@@ -72,7 +72,6 @@ write(G2),write("\n"),write(" proc rec etape4 \n"),type_block([(X,fleche(L,void)
 type_expar(G,adr(X),ref(T)):-write("expar adr \n"),write(E),write(T),type_expr(X,id(X),ref(T)).
 /* exprp -> val */
 type_expar(G,E,T):-write("expar val \n"),write(E),write(T),write("\n"),type_expr(G,E,T),write("fin expar val\n").
-
 
 /* expr -> num */
 type_expr(G,N,int):-write("num int \n"),write(N),write("\n"),integer(N),write("fin num int\n").
