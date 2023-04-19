@@ -12,8 +12,26 @@ Une courte description du projet et de ses objectifs.
 
 
 ## APS0
-- mal codé, on s'en est rendu compte après 
-
+- APS0 implémente les éléments de bases pour le typeur et l'évaluateur.
+- On s'est rendu compte lors du codage d'APS1a, que le code du typeur et de l'évaluateur comportait beaucoup d'erreur.
+- choix d'implémentation : l'environnement.
+En effet, pour le typeur, nous avons fait le choix d'avoir un environnement initial comportant les opérations de base :
+```
+g0([(true,bool),(false,bool),(not,fleche([bool],bool)),(eq,fleche([int,int],bool)),
+(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(or,fleche([bool,bool],bool)),(and,fleche([bool,bool],bool)),(sub,fleche([int,int],int)),
+(mul,fleche([int,int],int)),(div,fleche([int,int],int))]).
+```
+Pour l'évaluateur, nous sommes partis sur un module déjà existant, module Env = Map.Make(String).
+Cela nous permettait d'optimiser notre code.
+```
+| lookup x env = match Env.find_opt x env with 
+            | None -> assert false
+            | Some v -> v
+	
+ Env.add x (eval_expr env e) env
+ 
+ Env.empty
+ ```
 
 ## APS1a
 - extension : nous avons rajouté un printer dans l'évaluateur qui nous permet de visualiser le résultat et nous assurer que notre évaluateur est correct.
