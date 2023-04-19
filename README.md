@@ -62,6 +62,8 @@ clean:
 	rm *~
 ```
 
+Grâce au Makefile pour compiler, il nous suffit d'écrire make dans le terminal.
+
 
 ## Exécution 
 
