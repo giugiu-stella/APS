@@ -95,10 +95,10 @@ type_expr([(X1,T1)|G],arg(X),ref(T)):-type_expr(G,arg(X),ref(T)).
 type_expr([(X,T)|G],id(X),T).
 type_expr([(X1,T1)|G],id(X),T):-type_expr(G,id(X),T).
 ```
-- l'environnement : 
+- implémentation de l'environnement : 
 Nous avons modifié l'environnement car le module nous faisait perdre du temps, compréhension exact du module plus ma version d'Ocaml n'étant pas à jour, je ne pouvais pas avoir accès à certaines options. N'arrivant pas à mettre à jour ocaml sur mon macbook, nous avons modifié l'environnement en tant que (string * value) list.
 
-- la mémoire : 
+- implémentation de la mémoire : 
 Chaque fois que la fonction "alloc" est appelée, elle crée une nouvelle paire contenant l'identifiant de l'allocation et une référence à une valeur initialisée à -1, et ajoute cette paire à une liste, incrémente le compteur d'allocations et retourne la paire nouvellement créée. Cela permet de suivre les allocations de mémoire effectuées par la fonction et de référencer chaque nouvelle allocation par un identifiant unique.
 
 ```
@@ -116,8 +116,26 @@ let alloc m =
 
 ## APS2
 
-APS2 n'est pas fini. 
+- APS2 n'est pas fini. 
 Son typeur compile et execute correctement cependant, son évaluateur comporte encore des erreurs.
+- implémentation du tableau : 
+Le code fourni implémente une fonction allocTab qui alloue un tableau en mémoire en prenant en entrée une liste représentant la mémoire disponible et la taille du tableau à allouer. La fonction vérifie que la taille est supérieure à zéro, puis elle ajoute un nombre déterminé d'éléments vides à la liste de mémoire en incrémentant l'adresse mémoire à chaque ajout. La fonction renvoie finalement un couple contenant l'adresse de début du tableau et la liste de mémoire modifiée.
+ 
+ ```
+ let allocTab m size =
+    if (size <= 0) then failwith "Taille impossible !\n"
+    else
+        let address = !index_mem in
+            let rec ajout_mem new_mem n =
+            match n with
+                0 -> new_mem
+            | _ -> (
+                let tmp = !index_mem in
+                index_mem := (!index_mem + 1); 
+                    ajout_mem ((tmp, ref(INZ(-1)))::new_mem) (n - 1)
+                ) in
+            (address, (ajout_mem m size))
+ ```
 
 
 ## Compilation
@@ -164,4 +182,10 @@ Grâce au Makefile pour compiler, il nous suffit d'écrire make dans le terminal
 
 - pour prologTerm : ./prologTerm test.aps
 - pour le typeur : ./prologTerm test.aps | swipl -l typrog.pl -g main
+```
+main:-read(AST),check(AST).
+check(AST):-type_prog(AST),write("ok!").
+check(AST):-write("nop "), write("AST: "), write(AST).
+```
+Cela nous permet d'utiliser directement le résultat de prologTerm et de s'avoir si le test passe, ok! dans le terminal ou nop : avec le prologTerm du test s'il y a une erreur.
 - pour l'évaluateur : ./eval test.aps
