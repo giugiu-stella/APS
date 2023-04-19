@@ -115,9 +115,9 @@ let alloc m =
 
 
 ## APS2
+
 APS2 n'est pas fini. 
 Son typeur compile et execute correctement cependant, son évaluateur comporte encore des erreurs.
--
 
 
 ## Compilation
