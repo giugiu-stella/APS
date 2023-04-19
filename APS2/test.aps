@@ -1,16 +1,13 @@
 [
-  VAR x (vec int);
-  PROC p [n:int]
-    [
-      VAR y int;
-      SET y (mul n 2);
-      SET x y
-    ];
-  VAR z int;
-  SET z 24;
-  ECHO x;
-  IF true
-    [ CALL p 21 ]
-    [ ECHO x ];
-  ECHO (nth x 5)
+  CONST tab (vec (vec int)) (alloc 2);
+  SET (nth tab 0) (alloc 2);
+  SET (nth tab 1) (alloc 2);
+  SET (nth (nth tab 0) 0) 10;
+  SET (nth (nth tab 0) 1) 20;
+  SET (nth (nth tab 1) 0) 30;
+  SET (nth (nth tab 1) 1) 40;
+  CONST y int (nth tab 1);
+  SET (nth y 0) 42;
+  IF (eq (nth (nth tab 1) 0) 42 )[ECHO 1] [ECHO 0];
+  ECHO 2
 ]

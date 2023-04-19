@@ -129,7 +129,7 @@ and print_stat s =
         print_expr e;
         Printf.printf ")";
       | ASTIfStat(e,bk1,bk2)-> (
-        Printf.printf "if";
+        Printf.printf "ifbk";
         Printf.printf "(";
         print_expr e;
         Printf.printf ",";
@@ -163,7 +163,10 @@ and print_cmd c =
         Printf.printf "stat(";
         print_stat s;
         Printf.printf ")";
-      | ASTDef(d) -> print_def d
+      | ASTDef(d) -> 
+        Printf.printf "def(";
+        print_def d;
+        Printf.printf ")";
       
 	
 and print_cmds cs =

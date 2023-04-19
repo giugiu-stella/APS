@@ -1,7 +1,7 @@
 /* contexte initial */
 g0([(true,bool),(false,bool),(not,fleche([bool],bool)),(eq,fleche([int,int],bool)),
-(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(addi,fleche([int,int],int)),(sub,fleche([int,int],int)),
-(mul,fleche([int,int],int)),(div,fleche([int,int],int))]).
+(lt,fleche([int,int],bool)),(add,fleche([int,int],int)),(sub,fleche([int,int],int)),
+(mul,fleche([int,int],int)),(div,fleche([int,int],int)),(or,fleche([bool,bool],bool)),(and,fleche([bool,bool],bool))]).
 
 /* main */
 /*main:-read_term(AST,_),check(AST).
@@ -20,7 +20,7 @@ type_prog(prog(X)):- write("prog\n"),g0(G),type_block(G,X,void).
 type_block(G,block(X),void):- write("block \n"),write(G),write("\n"),type_cmds(G,X,void).
 
 /* cmds -> end */
-type_cmds(G,[],void).
+type_cmds(G,[],void):-write("cmds vide\n").
 /* cmds -> defs */
 type_cmds(G,[def(D)|X],void):-write("cmd def \n"),type_def(G,D,G2),write(G2),write("\n"),type_cmds(G2,X,void).
 /* cmds -> stat */
@@ -29,9 +29,9 @@ type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_s
 /* stat-> echo */
 type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),type_expr(G,E,int).
 /* stat -> set */
-type_stat(G,set(X,E),void):-write("set \n"),write(G),type_lvalue(G,X,ref(T)),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
+type_stat(G,set(X,E),void):-write("set \n"),write(G),type_lvalue(G,X,T),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
 /* stat-> if */ 
-type_stat(G,ifbk(E,BK1,BK2),void):-write("ifbk\n"),write(G),write("\n"),write(E),type_expr(G,E,bool),write(T),write("\n"),write("ifbk etape2\n"),type_block(G,BK1,void),write("ifbk etape3\n"),type_block(G,BK2,void),write("fin ifbk\n").
+type_stat(G,ifbk(E,BK1,BK2),void):-write("ifbk\n"),write(G),write("\n"),write(E),type_expr(G,E,bool),write("\n"),write("ifbk etape2\n"),type_block(G,BK1,void),write("ifbk etape3\n"),type_block(G,BK2,void),write("fin ifbk\n").
 /* stat -> while */
 type_stat(G,while(E,BK),void):-type_expr(G,E,bool),type_block(G,BK,void).
 /* stat -> call */
@@ -39,7 +39,7 @@ type_stat(G,call(X,EPS),void):-write("call \n"),write(G),write("\n"),write(X),wr
 type_exparlist(G,[],[]).
 type_exparlist(G,[L1|RL],[T1|RT]):-write("exparlist \n"),write(L1),write(T1),write("\n"),type_expar(G,L1,T1),type_exparlist(G,RL,RT).
 /* def -> const */
-type_def(G,const(X,T,E),[(X,T)|G]):-type_expr(G,E,T).
+type_def(G,const(X,T,E),[(X,T)|G]):-write("const \n"),type_expr(G,E,T).
 /* def -> fun */
 type_def(G,fun(X,T,ListArg,E),[(X,fleche(ListT,T))|G]):-write("fun\n"),write(G),write("\n ListArg:"),write(ListArg),
 write("\n"),write(ListT),recup_type(ListArg,ListT),write("\n ListT : "),write(ListT),write("\n"),write(L),
@@ -82,7 +82,6 @@ type_expr(G,false,bool):-write("ici\n").
 type_expr(G,true,bool):-write("là\n").
 /* expr -> id ref*/
 type_expr([(X,ref(T))|G],id(X),T):-write("id ref\n").
-type_expr([(X,vec(T))|G],id(X),T):-write("id ref\n").
 /* expr -> id */
 type_expr([(X,ref(T))|G],arg(X),ref(T)):-write("arg pour set\n").
 type_expr([(X1,T1)|G],arg(X),ref(T)):-write("arg pour set pas premier\n"),write(X),write(X1),type_expr(G,arg(X),ref(T)).
@@ -102,14 +101,14 @@ type_expr(G,app(E,ListE),T):-write("app\n"),write(ListE),write("\n"),type_expr(G
 type_exprlist(G,[],[]).
 type_exprlist(G,[L1|RL],[T1|RT]):-write(L1),write(T1),write("\n"),type_expr(G,L1,T1),type_exprlist(G,RL,RT).
 /* expr -> alloc */
-type_expr(G,alloc(E),vec(T)):-type_expr(G,E,int).
+type_expr(G,alloc(E),vec(T)):-write("alloc \n"),type_expr(G,E,int).
 /* expr -> len */
-type_expr(G,len(E),int):-type_expr(G,E,vec(T)).
+type_expr(G,len(E),int):-write("len \n"),type_expr(G,E,vec(T)).
 /* expr -> nth */
-type_expr(G,nth(E1,E2),T):-type_expr(G,E1,vec(T)),type_expr(G,E2,int).
+type_expr(G,nth(E1,E2),T):-write("nth \n"),type_expr(G,E1,vec(T)),type_expr(G,E2,int).
 /* expr -> vset */
-type_expr(G,vset(E1,E2,E3),T):-type_expr(G,E1,vec(T)),type_expr(G,E2,int),type_expr(G,E3,T).
+type_expr(G,vset(E1,E2,E3),T):-write("vset \n"),type_expr(G,E1,vec(T)),type_expr(G,E2,int),type_expr(G,E3,T).
 
 /* lvalue */
-type_lvalue(G,ident(ID),T):-type_expr(G,id(ID),T).
-type_lvalue(G,nth(X,E),T):-type_expr(G,X,vec(T)),type_expr(G,E,T).
+type_lvalue(G,ident(ID),T):-write("value ident \n"),type_expr(G,id(ID),T),write("fin value ident\n").
+type_lvalue(G,nth(X,E),T):-write("value nth \n"),type_lvalue(G,X,vec(T)),write("etape 2 \n"),type_expr(G,E,int).
