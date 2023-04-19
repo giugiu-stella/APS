@@ -27,7 +27,7 @@ type_cmds(G,[def(D)|X],void):-write("cmd def \n"),type_def(G,D,G2),write(G2),wri
 type_cmds(G,[stat(S)|CS],void):-write("cmd stat \n"),write(S),write("\n"),type_stat(G,S,void),type_cmds(G,CS,void).
 
 /* stat-> echo */
-type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),type_expr(G,E,int).
+type_stat(G,echo(E),void):-write("echo-> \n"),write(G),write("\n"),write(E),write("\n"),type_expr(G,E,int).
 /* stat -> set */
 type_stat(G,set(X,E),void):-write("set \n"),write(G),type_lvalue(G,X,T),write("set etapege 2\n"),write(E),type_expr(G,E,T),write("fin set\n").
 /* stat-> if */ 
@@ -105,10 +105,14 @@ type_expr(G,alloc(E),vec(T)):-write("alloc \n"),type_expr(G,E,int).
 /* expr -> len */
 type_expr(G,len(E),int):-write("len \n"),type_expr(G,E,vec(T)).
 /* expr -> nth */
-type_expr(G,nth(E1,E2),T):-write("nth \n"),type_expr(G,E1,vec(T)),type_expr(G,E2,int).
+type_expr(G,nth(E1,E2),LT):-write("nth \n"),type_expr(G,E1,vec(T)),type_expr(G,E2,int),recup_type_vec(T,LT).
 /* expr -> vset */
 type_expr(G,vset(E1,E2,E3),T):-write("vset \n"),type_expr(G,E1,vec(T)),type_expr(G,E2,int),type_expr(G,E3,T).
 
 /* lvalue */
 type_lvalue(G,ident(ID),T):-write("value ident \n"),type_expr(G,id(ID),T),write("fin value ident\n").
-type_lvalue(G,nth(X,E),T):-write("value nth \n"),type_lvalue(G,X,vec(T)),write("etape 2 \n"),type_expr(G,E,int).
+type_lvalue(G,nth(X,E),LT):-write("value nth \n"),type_lvalue(G,X,T),write("etape 2 \n"),type_expr(G,E,int),recup_type_vec(T,LT).
+
+
+recup_type_vec(vec(T),LT):-recup_type_vec(T,LT).
+recup_type_vec(T,T).

@@ -6,8 +6,9 @@
   SET (nth (nth tab 0) 1) 20;
   SET (nth (nth tab 1) 0) 30;
   SET (nth (nth tab 1) 1) 40;
-  CONST y int (nth tab 1);
+  CONST y (vec int) (nth tab 1);
   SET (nth y 0) 42;
   IF (eq (nth (nth tab 1) 0) 42 )[ECHO 1] [ECHO 0];
+  IF (eq (nth y 0) 42 )[ECHO 1] [ECHO 0];
   ECHO 2
 ]
