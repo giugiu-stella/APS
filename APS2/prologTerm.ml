@@ -39,14 +39,6 @@ let rec print_expr e =
       print_expr faux;
       Printf.printf ")";
     )
-    | ASTAnd(e1,e2) -> (
-      Printf.printf "and";
-      Printf.printf "(";
-      print_expr e1;
-      Printf.printf ",";
-      print_expr e2;
-      Printf.printf ")";
-    )
     | ASTFun(args,e) -> (
       Printf.printf "abs";
       Printf.printf "(";
@@ -55,14 +47,6 @@ let rec print_expr e =
       Printf.printf "]";
       Printf.printf ",";
       print_expr e;
-      Printf.printf ")";
-    )
-    | ASTOr(e1,e2) -> (
-      Printf.printf "or";
-      Printf.printf "(";
-      print_expr e1;
-      Printf.printf ",";
-      print_expr e2;
       Printf.printf ")";
     )
     | ASTnth(e1, e2) -> (
@@ -91,6 +75,23 @@ let rec print_expr e =
       print_expr e3;
       Printf.printf ")";    
       )
+    | ASTBinary(op, e1, e2) ->(
+      Printf.printf "app(id(";
+      Printf.printf "%s" (op_to_string op);
+      Printf.printf "),";
+      Printf.printf "[";
+      print_expr e1;
+      Printf.printf ",";
+      print_expr e2;
+      Printf.printf "]";
+      Printf.printf ")";
+    )
+    | ASTNot(e) -> (
+        Printf.printf "app(" ;
+        Printf.printf "id(not), [";
+        print_expr e;
+        Printf.printf "])";
+      )
 
 and print_exprp ep = 
   match ep with
@@ -98,10 +99,20 @@ and print_exprp ep =
     | ASTExprpAdr(x)->(
       Printf.printf "adr";
       Printf.printf "(";
-      Printf.printf "%s" x;
+      print_expr x;
       Printf.printf ")";
     )
 
+ and op_to_string op = 
+    match op with
+      Add -> "add"
+    | Mul -> "mul"
+    | Sub -> "sub"
+    | Div -> "div"
+    | Eq -> "eq"
+    | Lt -> "lt"
+    | And -> "and"
+    | Or -> "or"
 
 and print_stat s =
   match s with
@@ -138,7 +149,7 @@ and print_stat s =
       | ASTCall(x,eps)->(
         Printf.printf "call";
         Printf.printf "(";
-        Printf.printf "%s" x;
+        print_expr x;
         Printf.printf ",";
         Printf.printf"[";
         print_list print_exprp eps ",";

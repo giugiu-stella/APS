@@ -103,7 +103,7 @@ styp:
  | typ ETOILE typs {$1::$3};
  
  typ:
- styp {[$1]}
+ styp {$1}
  | LPAR typs FLECHE typ RPAR { ASTTypFleche($2,$4) }
  | REF typ {ASTref($2)};
 

@@ -76,7 +76,6 @@ type_expar(G,E,T):-write("expar val \n"),write(E),write(T),write("\n"),type_expr
 
 /* expr -> num */
 type_expr(G,N,int):-write("num int \n"),write(N),write("\n"),integer(N),write("fin num int\n").
-type_expr(G,N,ref(int)):-write("num ref \n"),write(N),write("\n"),integer(N).
 /* expr -> bool */
 type_expr(G,false,bool):-write("ici\n").
 type_expr(G,true,bool):-write("là\n").

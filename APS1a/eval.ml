@@ -31,7 +31,7 @@ let alloc m =
 
 let eval_ops op e1 e2 =
     match op with
-    | Eq -> let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1==n2)then INZ(1) 
+    | Eq -> let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1=n2)then INZ(1) 
                             else INZ(0)
     | Lt ->let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1<n2)then INZ(1) else INZ(0)
     | Add ->  let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 + n2)
@@ -39,7 +39,7 @@ let eval_ops op e1 e2 =
     | Mul -> let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 * n2)
     | Div -> let INZ(n1)=e1 in let INZ(n2)=e2 in INZ(n1 / n2)
     | Or -> let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1+n2 >=1) then INZ(1) else INZ(0)
-    | And -> let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1+n2==2) then INZ(1) else INZ(0)
+    | And -> let INZ(n1)=e1 in let INZ(n2)=e2 in if(n1+n2=2) then INZ(1) else INZ(0)
 
 let rec eval_expr env e m = match e with
                     | ASTBool(true)-> INZ(1)
@@ -102,7 +102,7 @@ and eval_stat env w s m = match s with
                                         (fun x e env -> env@[x,(eval_expar env m e)]) 
                                         xs exprs env) 
                                         in eval_block env2 w bk m
-                                        | INPR(bk,x,xs,env1) -> Printf.printf "call INPR\n";  let env2=(List.fold_right2 (fun x e env -> env@[x,(eval_expar env m e)]) xs exprs env) 
+                                        | INPR(bk,x,xs,env1) -> Printf.printf "call INPR\n";  let env2=(List.fold_right2 (fun x e env -> [x,(eval_expar env m e)]@env) xs exprs env) 
                                     in eval_block (env2@[x,INPR(bk,x,xs,env1)]) w bk m
 
 and eval_def env d m = match d with
