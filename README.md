@@ -54,8 +54,7 @@ dans le terminal nous obtiendrons :
 2
 0
 ```
-- choix d'implémentation : 
-Nous avons modifié quelques lignes de grammaire.
+- Nous avons modifié quelques lignes de grammaire.
 ```
 ast du formulaire : 
  ASTSet of ident * expr
@@ -96,13 +95,29 @@ type_expr([(X1,T1)|G],arg(X),ref(T)):-type_expr(G,arg(X),ref(T)).
 type_expr([(X,T)|G],id(X),T).
 type_expr([(X1,T1)|G],id(X),T):-type_expr(G,id(X),T).
 ```
+- l'environnement : 
+Nous avons modifié l'environnement car le module nous faisait perdre du temps, compréhension exact du module plus ma version d'Ocaml n'étant pas à jour, je ne pouvais pas avoir accès à certaines options. N'arrivant pas à mettre à jour ocaml sur mon macbook, nous avons modifié l'environnement en tant que (string * value) list.
 
- mémoire
-- 
+- la mémoire : 
+Chaque fois que la fonction "alloc" est appelée, elle crée une nouvelle paire contenant l'identifiant de l'allocation et une référence à une valeur initialisée à -1, et ajoute cette paire à une liste, incrémente le compteur d'allocations et retourne la paire nouvellement créée. Cela permet de suivre les allocations de mémoire effectuées par la fonction et de référencer chaque nouvelle allocation par un identifiant unique.
+
+```
+let rec get_mem a  (m: (int * (value ref)) list) =
+    (match m with
+        | (a1,v1)::cs ->if(a == a1) then v1 else get_mem a cs
+        | _ -> assert false)
+
+let alloc m =
+    let i = (!index_mem, (!index_mem, ref(INZ(-1)))::m ) in
+    index_mem := (!index_mem + 1);
+    i
+```
 
 
 ## APS2
-- choix d'implémentation : tableau
+APS2 n'est pas fini. 
+Son typeur compile et execute correctement cependant, son évaluateur comporte encore des erreurs.
+-
 
 
 ## Compilation
