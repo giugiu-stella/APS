@@ -13,7 +13,7 @@ Une courte description du projet et de ses objectifs.
 
 ## APS0
 - APS0 implémente les éléments de bases pour le typeur et l'évaluateur.
-- On s'est rendu compte lors du codage d'APS1a, que le code du typeur et de l'évaluateur comportait beaucoup d'erreur.
+- On s'est rendu compte lors du codage d'APS1a que le code du typeur et de l'évaluateur comportait beaucoup d'erreurs.
 - choix d'implémentation : l'environnement.
 En effet, pour le typeur, nous avons fait le choix d'avoir un environnement initial comportant les opérations primitives :
 ```
@@ -117,9 +117,9 @@ let alloc m =
 ## APS2
 
 - APS2 n'est pas fini. 
-Son typeur compile et execute correctement cependant, son évaluateur comporte encore des erreurs.
-- implémentation du tableau : 
-Le code fourni implémente une fonction allocTab qui alloue un tableau en mémoire en prenant en entrée une liste représentant la mémoire disponible et la taille du tableau à allouer. La fonction vérifie que la taille est supérieure à zéro, puis elle ajoute un nombre déterminé d'éléments vides à la liste de mémoire en incrémentant l'adresse mémoire à chaque ajout. La fonction renvoie finalement un couple contenant l'adresse de début du tableau et la liste de mémoire modifiée.
+Son typeur compile et exécute correctement cependant, son évaluateur comporte encore des erreurs.
+- implémentation du tableau :
+La fonction allocTab alloue un tableau en mémoire en prenant en entrée une liste représentant la mémoire disponible et la taille du tableau à allouer. La fonction vérifie que la taille est supérieure à zéro, puis elle ajoute un nombre déterminé d'éléments vides à la liste de mémoire en incrémentant l'adresse mémoire à chaque ajout. La fonction renvoie finalement un couple contenant l'adresse de début du tableau et la liste de mémoire modifiée.
  
  ```
  let allocTab m size =
