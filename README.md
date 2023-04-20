@@ -117,7 +117,7 @@ let alloc m =
 ## APS2
 
 - APS2 n'est pas fini. 
-Son typeur compile et exécute correctement cependant, son évaluateur comporte encore des erreurs, il compile mais s'exécute avec une erreur (à noter que les tests: test.aps, test2.aps et test3.aps s'exécute bien et renvoie le bon résulat). L'erreur se trouve dans eval_lvalue pour ASTvalueId, en effet lors du match de l'évaluation de l'expression ne devrait renvoyer que INA mais il renvoie des INB et des INZ. Par manque de temps , je n'ai pas réussi à fixer ce problème.
+Son typeur compile et exécute correctement cependant, son évaluateur comporte encore des erreurs, il compile mais s'exécute avec une erreur (à noter que les tests: test.aps, test2.aps et test3.aps s'exécute bien et renvoie le bon résulat). L'erreur se trouve dans eval_lvalue pour ASTvalueId. En effet, lors du match de l'évaluation de l'expression on ne devrait obtenir que INA mais il y a des INB et des INZ. Par manque de temps , je n'ai pas réussi à fixer ce problème.
 - implémentation du tableau :
 La fonction allocTab alloue un tableau en mémoire en prenant en entrée une liste représentant la mémoire disponible et la taille du tableau à allouer. La fonction vérifie que la taille est supérieure à zéro, puis elle ajoute un nombre déterminé d'éléments vides à la liste de mémoire en incrémentant l'adresse mémoire à chaque ajout. La fonction renvoie finalement un couple contenant l'adresse de début du tableau et la liste de mémoire modifiée.
  
