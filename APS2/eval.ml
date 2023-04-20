@@ -108,23 +108,13 @@ let rec eval_expr env e m = match e with
                                                 match i with
                                                 INZ(x) -> ( match v with
                                                             INB(a, size) -> ( if x < size then let INZ(k)= j in
-                                                                (INB(a, size),(!(get_mem (a+x) mem2), ref(INZ(k)))::mem3) 
-                                                        else failwith "Evaluation of nth: index out of range")
-                                                            | v -> (failwith "Evaluation of nth: not a vec"))
+                                                            let INZ(ent)= !(get_mem (a+x) mem2) in 
+                                                                (INB(a, size),(ent, ref(INZ(k)))::mem3) 
+                                                        else failwith "Evaluation of vset: index out of range")
+                                                            | v -> (failwith "Evaluation of vset: not a vec"))
                                                                     
                                                 | v -> failwith "Evaluation of vset: not an integer")
                         
-                        
-                        
-                        
-                        (match (eval_expr env e1 m) with
-                                        (INB(a,n),m1)-> match (eval_expr env e2 m1) with
-                                                        (INZ(i),m2)-> match (eval_expr env e3 m2) with
-                                                                    (v,m3)-> let a_new = a +i in a_new:=v; 
-                                                                    let res= get_m a_new m3 in (INB(a,n),res)
-                                                                    |_->failwith "error vset e3\n"
-                                                        |_->failwith "error vset e2\n"
-                                        |_->failwith "error vset e1\n" )
 
 and eval_expar env m e = match e with 
                         ASTExprpAdr(ASTId(x))->Printf.printf "expar adr \n"; (lookup x env,m)
@@ -168,9 +158,15 @@ and eval_lvalue env w lv m = match lv with
                                                     ASTvalueId(x) -> (match (eval_expr env (ASTId(x)) m) with
                                                                     (INB(a1,n1),m1) -> let (INZ(i),m2)= eval_expr env e m1 in (a1+i,m2)
                                                                     |_-> failwith "error lvalue value\n")
-                                                    | ASTValue(x1,e1) -> let (a1,m1)= eval_lvalue env w valeur m in let
-                                                                        INB(a2,_)= get_m a1 m1 in 
-                                                                         let (INZ(i),m2) = eval_expr env e m1 in (a2+i,m2))
+                                                    | ASTValue(x1,e1) -> (let (a1,m1)= eval_lvalue env w x1 m in 
+                                                                         let (e2,m2) = eval_expr env e m1
+                                                                            in (match e2 with
+                                                                                INZ(x2) -> (match !(get_mem a1 m1) with
+                                                                                            INB(a2,n) -> (a2+x2,m2)
+                                                                                            | _ ->failwith "error lvalue value\n")
+                                                                                |_->failwith "error lvalue value\n"))
+                
+                                                    |_-> failwith "error lvalue value\n")
 
 
 and eval_def env d m = match d with
