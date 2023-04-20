@@ -117,7 +117,7 @@ let alloc m =
 ## APS2
 
 - APS2 n'est pas fini. 
-Son typeur compile et exécute correctement cependant, son évaluateur comporte encore des erreurs, il compile mais ne s'exécute avec des erreurs.
+Son typeur compile et exécute correctement cependant, son évaluateur comporte encore des erreurs, il compile mais ne s'exécute avec une erreur (à noter que les tests: test.aps, test2.aps et test3.aps s'exécute bien et renvoie le bon résulat). L'erreur se trouve dans eval_lvalue pour ASTvalueId, en effet lors du match evaluation de l'expression ne devrait renvoyer que INA mais il renvoie des INB et des INZ. Par manque de temps , je n'ai pas réussi à fixer ce problème.
 - implémentation du tableau :
 La fonction allocTab alloue un tableau en mémoire en prenant en entrée une liste représentant la mémoire disponible et la taille du tableau à allouer. La fonction vérifie que la taille est supérieure à zéro, puis elle ajoute un nombre déterminé d'éléments vides à la liste de mémoire en incrémentant l'adresse mémoire à chaque ajout. La fonction renvoie finalement un couple contenant l'adresse de début du tableau et la liste de mémoire modifiée.
  
@@ -144,25 +144,23 @@ Makefile :
 ```
 LEX_ML = ocamllex
 YACC_ML = /usr/local/bin/ocamlyacc
-YACC_ML= ocamlyacc
-OCAMLC = ocamlc -g
- 
+OCAMLC = ocamlc
+
 all: prologTerm eval
 
-eval: parser
-	$(OCAMLC) -o eval ast.cmo lexer.cmo parser.cmo
-	
+eval: parser eval.ml
+	$(OCAMLC) -o eval ast.cmo lexer.cmo parser.cmo eval.ml
+
 prologTerm: parser prologTerm.ml
 	$(OCAMLC) -o prologTerm ast.cmo lexer.cmo parser.cmo prologTerm.ml
 
-parser: ast.ml lexer.mll parser.mly 
+parser: ast.ml lexer.mll parser.mly
 	$(OCAMLC) -c ast.ml
 	$(LEX_ML) -o lexer.ml lexer.mll
 	$(YACC_ML) -b parser parser.mly
 	$(OCAMLC) -c parser.mli
 	$(OCAMLC) -c lexer.ml
 	$(OCAMLC) -c parser.ml
-	$(OCAMLC) -c eval.ml
 
 clean:
 	rm -f *.cmo
@@ -172,7 +170,6 @@ clean:
 	rm -f lexer.ml
 	rm -f parser.mli
 	rm -f parser.ml
-	rm *~
 ```
 
 Grâce au Makefile pour compiler, il nous suffit d'écrire make dans le terminal.
